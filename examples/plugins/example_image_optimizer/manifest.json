@@ -1,0 +1,73 @@
+{
+  "id": "com.example.image-optimizer",
+  "name": "Image Optimizer Plugin",
+  "version": "1.0.0",
+  "author": "File Processing Suite Team",
+  "description": "Optimizes images by compressing and resizing while maintaining quality",
+  "plugin_type": "processor",
+  "min_app_version": "7.0.0",
+  "dependencies": [],
+  "python_packages": [
+    "Pillow>=10.0.0"
+  ],
+  "supported_formats": [
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".webp"
+  ],
+  "capabilities": [
+    "compress",
+    "resize",
+    "format_conversion"
+  ],
+  "hooks": [
+    "pre_process",
+    "post_process"
+  ],
+  "homepage": "https://example.com/plugins/image-optimizer",
+  "repository": "https://github.com/example/image-optimizer-plugin",
+  "license": "MIT",
+  "tags": [
+    "image",
+    "optimization",
+    "compression"
+  ],
+  "config_schema": {
+    "quality": {
+      "type": "integer",
+      "default": 85,
+      "min": 1,
+      "max": 100,
+      "description": "JPEG quality (1-100)"
+    },
+    "max_width": {
+      "type": "integer",
+      "default": 1920,
+      "description": "Maximum width in pixels"
+    },
+    "max_height": {
+      "type": "integer",
+      "default": 1080,
+      "description": "Maximum height in pixels"
+    },
+    "output_format": {
+      "type": "string",
+      "default": "auto",
+      "options": [
+        "auto",
+        "jpeg",
+        "png",
+        "webp"
+      ],
+      "description": "Output format (auto keeps original)"
+    }
+  },
+  "default_config": {
+    "quality": 85,
+    "max_width": 1920,
+    "max_height": 1080,
+    "output_format": "auto"
+  },
+  "enabled": true
+}

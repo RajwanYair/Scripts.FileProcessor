@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+type: software
+title: "file-processor"
+version: "7.0.0"
+abstract: >
+  General-purpose file processing pipeline. Apply transformations, filters,
+  metadata extraction, deduplication, format conversion, and batch operations
+  to any set of files via a unified CLI and REST API.
+license: MIT
+repository-code: "https://github.com/<org>/file-processor"
+keywords:
+  - file-processing
+  - cli
+  - automation
+  - batch-processing
+  - deduplication
+  - file-conversion
+  - python

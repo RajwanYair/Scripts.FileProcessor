@@ -1,0 +1,64 @@
+# PR Labeler Configuration
+# Maps file path globs to labels applied automatically to pull requests.
+# Docs: https://github.com/actions/labeler
+
+# ── Source code ───────────────────────────────────────────────────────────────
+"area: core":
+  - changed-files:
+      - any-glob-to-any-file: "src/file_processor/core/**"
+
+"area: cli":
+  - changed-files:
+      - any-glob-to-any-file: "src/file_processor/cli/**"
+
+"area: api":
+  - changed-files:
+      - any-glob-to-any-file: "src/file_processor/api/**"
+
+"area: plugins":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/file_processor/plugins/**"
+          - "examples/plugins/**"
+
+# ── Tests ─────────────────────────────────────────────────────────────────────
+"area: tests":
+  - changed-files:
+      - any-glob-to-any-file: "tests/**"
+
+# ── CI/CD ─────────────────────────────────────────────────────────────────────
+"area: ci":
+  - changed-files:
+      - any-glob-to-any-file: ".github/workflows/**"
+
+# ── Configuration ─────────────────────────────────────────────────────────────
+"area: config":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "config/**"
+          - "pyproject.toml"
+          - "pyrightconfig.json"
+          - ".pre-commit-config.yaml"
+
+# ── Documentation ─────────────────────────────────────────────────────────────
+"area: docs":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "docs/**"
+          - "*.md"
+          - "*.rst"
+
+# ── Docker ────────────────────────────────────────────────────────────────────
+"area: docker":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "Dockerfile"
+          - "docker-compose.yml"
+          - ".dockerignore"
+
+# ── Dependencies ──────────────────────────────────────────────────────────────
+"dependencies":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "requirements*.txt"
+          - "pyproject.toml"

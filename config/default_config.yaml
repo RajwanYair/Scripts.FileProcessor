@@ -1,0 +1,143 @@
+# file-processor — Default Configuration
+# ========================================
+#
+# All values can be overridden by:
+#   1. A user config file passed via  -c / --config
+#   2. Environment variables embedded with  ${VAR_NAME:default}  syntax
+#   3. CLI flags (highest priority)
+#
+# Boolean values: true / false
+# Paths: relative to the working directory, or absolute.
+
+# ---------------------------------------------------------------------------
+# Processing behaviour
+# ---------------------------------------------------------------------------
+
+# Preview-only — no files are written when true
+dry_run: false
+
+# Enable verbose console output (equivalent to --verbose)
+verbose: false
+
+# Number of parallel worker threads (0 = auto-detect: min(32, cpu_count + 4))
+max_workers: ${FP_WORKERS:0}
+
+# Log level for the root logger: DEBUG, INFO, WARNING, ERROR
+log_level: ${LOG_LEVEL:WARNING}
+
+# ---------------------------------------------------------------------------
+# File operations
+# ---------------------------------------------------------------------------
+
+# Keep a copy of every source file before any transformation
+backup_originals: false
+backup_directory: "_backup_originals"
+
+# Rename .jpeg → .jpg, .tiff → .tif, etc.
+normalize_extensions: true
+
+# Replace forbidden characters (< > : " / \ | ? *) in filenames
+sanitize_filenames: true
+
+# Translate non-ASCII filename words to English (requires googletrans)
+translate_filenames: false
+
+# Remove exact duplicate files (by SHA-256 hash) during processing
+remove_duplicates: false
+
+# ---------------------------------------------------------------------------
+# Extension normalisation map
+# Aliases on the left are rewritten to canonical forms on the right.
+# ---------------------------------------------------------------------------
+extension_mapping:
+  .jpeg: .jpg
+  .jpe: .jpg
+  .jfif: .jpg
+  .tiff: .tif
+  .mpeg: .mpg
+  .m4v: .mp4
+  .htm: .html
+
+# ---------------------------------------------------------------------------
+# Plugin system
+# ---------------------------------------------------------------------------
+plugins:
+  # Directory where installed plugins are discovered
+  directory: "${FP_PLUGINS_DIR:~/.local/share/file-processor/plugins}"
+  # Auto-load all plugins in the directory at startup
+  autoload: true
+
+# ---------------------------------------------------------------------------
+# REST API server defaults
+# ---------------------------------------------------------------------------
+api:
+  host: "${FP_API_HOST:127.0.0.1}"
+  port: ${FP_API_PORT:8000}
+  reload: false
+  workers: 1
+noise_patterns:
+  - \[.*?\]
+  - \(.*?\)
+  - _+
+  - -+
+  - \s+
+  - \.\.+
+series_patterns:
+  - (.+?)\s*[vV]ol\.?\s*(\d+)
+  - (.+?)\s*[sS]eason\s*(\d+)
+  - (.+?)\s*[pP]art\s*(\d+)
+  - (.+?)\s*[eE]pisode\s*(\d+)
+  - (.+?)\s*[cC]hapter\s*(\d+)
+  - (.+?)\s*(\d+)
+file_type_settings:
+  images:
+    extensions:
+      - .jpg
+      - .jpeg
+      - .png
+      - .gif
+      - .bmp
+      - .tiff
+      - .webp
+    extract_metadata: true
+    organize_by_date: true
+    resize_large_images: false
+  videos:
+    extensions:
+      - .mp4
+      - .avi
+      - .mkv
+      - .mov
+      - .wmv
+      - .flv
+      - .webm
+    extract_metadata: true
+    organize_by_date: true
+    compress_large_files: false
+  documents:
+    extensions:
+      - .pdf
+      - .doc
+      - .docx
+      - .txt
+      - .rtf
+      - .odt
+    extract_metadata: true
+    organize_by_type: true
+    ocr_scanned_docs: false
+duplicate_detection:
+  method: size_and_hash
+  hash_algorithm: sha256
+  action: move_to_folder
+  duplicate_folder: _duplicates_found
+  keep_newest: true
+logging:
+  level: INFO
+  log_file: filename_processor.log
+  max_log_size: 20MB
+  backup_count: 10
+translation:
+  enabled: true
+  target_language: en
+  preserve_original: true
+  translation_service: auto

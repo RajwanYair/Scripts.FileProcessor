@@ -1,0 +1,57 @@
+{
+  "id": "com.example.text-analyzer",
+  "name": "Text Analyzer Plugin",
+  "version": "1.0.0",
+  "author": "File Processing Suite Team",
+  "description": "Advanced text analysis: sentiment, keywords, language detection, summarization",
+  "plugin_type": "analyzer",
+  "min_app_version": "7.0.0",
+  "dependencies": [],
+  "python_packages": [
+    "nltk>=3.8",
+    "textblob>=0.17.0"
+  ],
+  "supported_formats": [
+    ".txt",
+    ".md",
+    ".log",
+    ".csv",
+    ".json"
+  ],
+  "capabilities": [
+    "sentiment_analysis",
+    "keyword_extraction",
+    "language_detection",
+    "readability",
+    "statistics"
+  ],
+  "hooks": [
+    "post_process"
+  ],
+  "homepage": "https://example.com/plugins/text-analyzer",
+  "repository": "https://github.com/example/text-analyzer-plugin",
+  "license": "MIT",
+  "tags": [
+    "text",
+    "nlp",
+    "analysis",
+    "sentiment"
+  ],
+  "config_schema": {
+    "min_word_length": {
+      "type": "integer",
+      "default": 3,
+      "description": "Minimum word length for keyword extraction"
+    },
+    "top_keywords": {
+      "type": "integer",
+      "default": 10,
+      "description": "Number of top keywords to extract"
+    }
+  },
+  "default_config": {
+    "min_word_length": 3,
+    "top_keywords": 10
+  },
+  "enabled": true
+}

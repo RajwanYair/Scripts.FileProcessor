@@ -1,0 +1,57 @@
+{
+  "id": "com.example.pdf-processor",
+  "name": "PDF Processor Plugin",
+  "version": "1.0.0",
+  "author": "File Processing Suite Team",
+  "description": "Comprehensive PDF processing: merge, split, extract, compress, and convert",
+  "plugin_type": "processor",
+  "min_app_version": "7.0.0",
+  "dependencies": [],
+  "python_packages": [
+    "PyPDF2>=3.0.0",
+    "reportlab>=4.0.0"
+  ],
+  "supported_formats": [
+    ".pdf"
+  ],
+  "capabilities": [
+    "merge",
+    "split",
+    "extract_pages",
+    "extract_text",
+    "compress",
+    "convert_to_images"
+  ],
+  "hooks": [
+    "pre_process",
+    "post_process"
+  ],
+  "homepage": "https://example.com/plugins/pdf-processor",
+  "repository": "https://github.com/example/pdf-processor-plugin",
+  "license": "MIT",
+  "tags": [
+    "pdf",
+    "document",
+    "merge",
+    "split"
+  ],
+  "config_schema": {
+    "compression_level": {
+      "type": "integer",
+      "default": 5,
+      "min": 1,
+      "max": 9,
+      "description": "PDF compression level (1-9)"
+    },
+    "image_dpi": {
+      "type": "integer",
+      "default": 150,
+      "description": "DPI for PDF to image conversion"
+    }
+  },
+  "default_config": {
+    "compression_level": 5,
+    "image_dpi": 150
+  },
+  "enabled": true
+}

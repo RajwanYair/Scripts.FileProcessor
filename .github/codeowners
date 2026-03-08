@@ -1,0 +1,21 @@
+﻿# CODEOWNERS
+
+# Defines code owners for automatic review assignment
+
+# Syntax: <pattern> <owner1> [owner2 ...]
+
+# Global default — all files require a maintainer review
+* @file-processor-maintainers
+
+# Core logic is the most sensitive — always require review
+src/file_processor/core/ @file-processor-maintainers
+
+# API surface
+src/file_processor/api/ @file-processor-maintainers
+
+# CI/CD workflows — require careful review
+.github/workflows/ @file-processor-maintainers
+
+# Security and packaging
+SECURITY.md @file-processor-maintainers
+pyproject.toml @file-processor-maintainers

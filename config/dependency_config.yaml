@@ -1,0 +1,307 @@
+# Dependency Configuration
+# =========================
+#
+# This file tracks the status of optional and required dependencies.
+# It is automatically generated and updated by the application.
+#
+# DO NOT edit manually - use the dependency manager instead.
+
+
+dependency_status:
+  pyyaml:
+    available: false
+    status: not_installed
+    fallback_method: Use limited functionality without this package
+    description: YAML configuration support
+    required: true
+  tqdm:
+    available: true
+    status: system_installed
+    fallback_method: Use limited functionality without this package
+    description: Progress bars and UI
+    required: true
+  Pillow:
+    available: true
+    status: system_installed
+    fallback_method: Use limited functionality without this package
+    description: Core image processing
+    required: true
+  psutil:
+    available: true
+    status: system_installed
+    fallback_method: Use limited functionality without this package
+    description: System monitoring
+    required: true
+  requests:
+    available: false
+    status: not_installed
+    fallback_method: Use limited functionality without this package
+    description: HTTP requests
+    required: true
+  chardet:
+    available: true
+    status: system_installed
+    fallback_method: Use limited functionality without this package
+    description: Character encoding detection
+    required: true
+  python-dateutil:
+    available: false
+    status: not_installed
+    fallback_method: Use limited functionality without this package
+    description: Date parsing
+    required: true
+  cryptography:
+    available: false
+    status: not_installed
+    fallback_method: Use limited functionality without this package
+    description: Cryptographic operations
+    required: true
+  rarfile:
+    available: true
+    status: system_installed
+    fallback_method: Use standard zipfile library
+    description: RAR archive support
+    required: false
+  py7zr:
+    available: true
+    status: system_installed
+    fallback_method: Use standard zipfile/tarfile
+    description: 7-Zip archive support
+    required: false
+  patoolib:
+    available: false
+    status: not_installed
+    fallback_method: Use format-specific libraries
+    description: Universal archive extraction
+    required: false
+  reportlab:
+    available: true
+    status: system_installed
+    fallback_method: Use basic PDF operations
+    description: PDF creation
+    required: false
+  PyPDF2:
+    available: true
+    status: system_installed
+    fallback_method: Use reportlab alternatives
+    description: PDF manipulation
+    required: false
+  ebooklib:
+    available: false
+    status: not_installed
+    fallback_method: Skip EPUB functionality
+    description: EPUB processing
+    required: false
+  rapidfuzz:
+    available: false
+    status: not_installed
+    fallback_method: Use difflib for similarity
+    description: Fast string similarity
+    required: false
+  Levenshtein:
+    available: false
+    status: not_installed
+    fallback_method: Use basic string comparison
+    description: Edit distance
+    required: false
+  googletrans:
+    available: false
+    status: not_installed
+    fallback_method: Skip translation features
+    description: Google Translate
+    required: false
+  magic:
+    available: false
+    status: not_installed
+    fallback_method: Use mimetypes library
+    description: File type detection
+    required: false
+  exifread:
+    available: false
+    status: not_installed
+    fallback_method: Use Pillow EXIF
+    description: EXIF data extraction
+    required: false
+  pillow-heif:
+    available: false
+    status: not_installed
+    fallback_method: Skip HEIC files
+    description: HEIC/HEIF support
+    required: false
+  turbojpeg:
+    available: false
+    status: not_installed
+    fallback_method: Use standard Pillow
+    description: Fast JPEG processing
+    required: false
+  cupy:
+    available: false
+    status: not_installed
+    fallback_method: Use CPU processing
+    description: GPU acceleration (CUDA 12.x)
+    required: false
+  opencv:
+    available: false
+    status: not_installed
+    fallback_method: Use basic image processing
+    description: Computer vision
+    required: false
+  numpy:
+    available: false
+    status: not_installed
+    fallback_method: Use standard math operations
+    description: Numerical computing
+    required: false
+  ffmpeg:
+    available: false
+    status: not_installed
+    fallback_method: Use Python alternatives instead of ffmpeg
+    description: 'ffmpeg: Video processing'
+    required: false
+  7z:
+    available: false
+    status: not_installed
+    fallback_method: Use Python alternatives instead of 7-Zip
+    description: '7-Zip: Archive extraction'
+    required: false
+  p7zip:
+    available: false
+    status: not_installed
+    fallback_method: Use Python alternatives instead of p7zip
+    description: 'p7zip: Archive extraction'
+    required: false
+  exiftool:
+    available: false
+    status: not_installed
+    fallback_method: Use Python alternatives instead of ExifTool
+    description: 'ExifTool: Metadata extraction'
+    required: false
+  magick:
+    available: false
+    status: not_installed
+    fallback_method: Use Python alternatives instead of ImageMagick
+    description: 'ImageMagick: Advanced image processing'
+    required: false
+fallback_config:
+  missing_dependencies:
+    pyyaml:
+      description: YAML configuration support
+      required: true
+      type: pip_package
+    requests:
+      description: HTTP requests
+      required: true
+      type: pip_package
+    python-dateutil:
+      description: Date parsing
+      required: true
+      type: pip_package
+    cryptography:
+      description: Cryptographic operations
+      required: true
+      type: pip_package
+    patoolib:
+      description: Universal archive extraction
+      required: false
+      type: pip_package
+    ebooklib:
+      description: EPUB processing
+      required: false
+      type: pip_package
+    rapidfuzz:
+      description: Fast string similarity
+      required: false
+      type: optional
+    Levenshtein:
+      description: Edit distance
+      required: false
+      type: optional
+    googletrans:
+      description: Google Translate
+      required: false
+      type: optional
+    magic:
+      description: File type detection
+      required: false
+      type: optional
+    exifread:
+      description: EXIF data extraction
+      required: false
+      type: optional
+    pillow-heif:
+      description: HEIC/HEIF support
+      required: false
+      type: optional
+    turbojpeg:
+      description: Fast JPEG processing
+      required: false
+      type: optional
+    cupy:
+      description: GPU acceleration (CUDA 12.x)
+      required: false
+      type: optional
+    opencv:
+      description: Computer vision
+      required: false
+      type: optional
+    numpy:
+      description: Numerical computing
+      required: false
+      type: optional
+    ffmpeg:
+      description: 'ffmpeg: Video processing'
+      required: false
+      type: external_tool
+    7z:
+      description: '7-Zip: Archive extraction'
+      required: false
+      type: external_tool
+    p7zip:
+      description: 'p7zip: Archive extraction'
+      required: false
+      type: external_tool
+    exiftool:
+      description: 'ExifTool: Metadata extraction'
+      required: false
+      type: external_tool
+    magick:
+      description: 'ImageMagick: Advanced image processing'
+      required: false
+      type: external_tool
+  fallback_methods:
+    pyyaml: Use limited functionality without this package
+    requests: Use limited functionality without this package
+    python-dateutil: Use limited functionality without this package
+    cryptography: Use limited functionality without this package
+    patoolib: Use format-specific libraries
+    ebooklib: Skip EPUB functionality
+    rapidfuzz: Use difflib for similarity
+    Levenshtein: Use basic string comparison
+    googletrans: Skip translation features
+    magic: Use mimetypes library
+    exifread: Use Pillow EXIF
+    pillow-heif: Skip HEIC files
+    turbojpeg: Use standard Pillow
+    cupy: Use CPU processing
+    opencv: Use basic image processing
+    numpy: Use standard math operations
+    ffmpeg: Use Python alternatives instead of ffmpeg
+    7z: Use Python alternatives instead of 7-Zip
+    p7zip: Use Python alternatives instead of p7zip
+    exiftool: Use Python alternatives instead of ExifTool
+    magick: Use Python alternatives instead of ImageMagick
+  available_features:
+    tqdm: Progress bars and UI
+    Pillow: Core image processing
+    psutil: System monitoring
+    chardet: Character encoding detection
+    rarfile: RAR archive support
+    py7zr: 7-Zip archive support
+    reportlab: PDF creation
+    PyPDF2: PDF manipulation
+  disabled_features: {}
+system_info:
+  platform: windows
+  python_version: 3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944
+    64 bit (AMD64)]
+  is_wsl: false

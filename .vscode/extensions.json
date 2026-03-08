@@ -1,0 +1,21 @@
+{
+  "recommendations": [
+    "charliermarsh.ruff",
+    "ms-python.python",
+    "ms-python.pylance",
+    "ms-python.mypy-type-checker",
+    "redhat.vscode-yaml",
+    "DavidAnson.vscode-markdownlint",
+    "GitHub.vscode-pull-request-github",
+    "eamodio.gitlens",
+    "ms-azuretools.vscode-docker",
+    "tamasfe.even-better-toml",
+    "ms-vscode-remote.remote-wsl"
+  ],
+  "unwantedRecommendations": [
+    "ms-python.pylint",
+    "ms-python.flake8",
+    "ms-python.black-formatter",
+    "ms-python.isort"
+  ]
+}

@@ -1,0 +1,94 @@
+name: Plugin Request
+description: Request a new plugin or plugin feature
+title: "[Plugin]: "
+labels: ["plugin", "enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new plugin or plugin enhancement!
+
+  - type: dropdown
+    id: request-type
+    attributes:
+      label: Request Type
+      options:
+        - New Plugin
+        - Plugin Enhancement
+        - Plugin Bug Fix
+    validations:
+      required: true
+
+  - type: input
+    id: plugin-name
+    attributes:
+      label: Plugin Name
+      description: What should this plugin be called?
+      placeholder: awesome-image-processor
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Plugin Category
+      options:
+        - Image Processing
+        - Document Processing
+        - Text Analysis
+        - Video Processing
+        - Audio Processing
+        - Cloud Storage
+        - Automation & Workflows
+        - Security & Privacy
+        - AI & Machine Learning
+        - Data Analysis
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Plugin Description
+      description: What should this plugin do?
+      placeholder: This plugin should...
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-cases
+    attributes:
+      label: Use Cases
+      description: What problems would this plugin solve?
+      placeholder: |
+        1. Users need to...
+        2. It would help with...
+
+  - type: textarea
+    id: technical
+    attributes:
+      label: Technical Requirements
+      description: Any specific libraries, APIs, or technical details
+      placeholder: Would need to use PIL for image processing...
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I would like to develop this plugin
+        - label: I can help test this plugin
+        - label: I can provide sample files/data
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - Critical - Blocking workflow
+        - High - Significant impact
+        - Medium - Nice to have
+        - Low - Future consideration
+    validations:
+      required: true

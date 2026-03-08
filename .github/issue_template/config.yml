@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 💬 Community Discussion
+    url: https://github.com/fileprocessor/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: 📚 Documentation
+    url: https://github.com/fileprocessor/docs
+    about: Read the comprehensive documentation
+  - name: 🔒 Security Issue
+    url: https://github.com/fileprocessor/security
+    about: Report a security vulnerability privately

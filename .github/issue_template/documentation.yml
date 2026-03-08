@@ -1,0 +1,58 @@
+name: Documentation Update
+description: Suggest improvements or corrections to documentation
+title: "[Docs]: "
+labels: ["documentation", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve our documentation!
+
+  - type: dropdown
+    id: doc-type
+    attributes:
+      label: Documentation Type
+      description: What type of documentation needs updating?
+      options:
+        - User Guide
+        - Developer Guide
+        - API Reference
+        - Tutorial
+        - Installation Instructions
+        - Configuration Guide
+        - README
+        - Code Comments
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue
+    attributes:
+      label: What's wrong with the current documentation?
+      description: Describe the issue or confusion
+      placeholder: The current documentation says...
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested Improvement
+      description: How should the documentation be improved?
+      placeholder: It should instead say...
+    validations:
+      required: true
+
+  - type: input
+    id: location
+    attributes:
+      label: Documentation Location
+      description: File path or URL of the documentation
+      placeholder: docs/guides/INSTALLATION_GUIDE.md
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other information that would help us improve the docs

@@ -1,0 +1,55 @@
+{
+  "$schema": "https://raw.githubusercontent.com/DavidAnson/markdownlint/main/schema/markdownlint-config-schema.json",
+  "default": true,
+  // MD009 - Trailing spaces: allow 2 spaces for line breaks
+  "MD009": {
+    "br_spaces": 2,
+    "strict": false
+  },
+  // MD013 - Line length: disabled (handled by editor/formatter)
+  "MD013": false,
+  // MD022 - Headings should be surrounded by blank lines: relaxed
+  "MD022": {
+    "lines_above": 1,
+    "lines_below": 0
+  },
+  // MD024 - Multiple headings with same content: allow different nesting levels
+  "MD024": {
+    "allow_different_nesting": true,
+    "siblings_only": true
+  },
+  // MD025 - Multiple top-level headings: disabled for docs with banner H1
+  "MD025": false,
+  // MD032 - Lists should be surrounded by blank lines: disabled (too strict)
+  "MD032": false,
+  // MD033 - Inline HTML: disabled (HTML allowed in GitHub-flavoured Markdown)
+  "MD033": false,
+  // MD034 - Bare URLs: disabled (URLs in code blocks are fine)
+  "MD034": false,
+  // MD040 - Fenced code blocks should have a language: disabled (informational blocks)
+  "MD040": false,
+  // MD041 - First line should be top-level heading: disabled (READMEs may start with badges)
+  "MD041": false,
+  // MD046 - Code block style: allow fenced blocks
+  "MD046": {
+    "style": "fenced"
+  },
+  // MD048 - Code fence style: use backticks
+  "MD048": {
+    "style": "backtick"
+  },
+  // MD049 - Emphasis style: underscores (consistent)
+  "MD049": {
+    "style": "underscore"
+  },
+  // MD050 - Strong style: asterisks (consistent)
+  "MD050": {
+    "style": "asterisk"
+  },
+  // MD055 - Table pipe style: consistent leading/trailing pipes
+  "MD055": {
+    "style": "leading_and_trailing"
+  },
+  // MD060 - Bare URLs should use angle brackets: disabled
+  "MD060": false
+}

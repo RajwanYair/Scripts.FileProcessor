@@ -1,0 +1,94 @@
+# File Processor Configuration
+# ==============================
+# 
+# This is the main configuration file for the File Processor application.
+# All settings can be edited through the GUI Configuration Editor or manually.
+#
+# To edit via GUI: python file_processor.py --config-editor
+# To use this config: Copy to 'default_config.yaml' or 'user_config.yaml'
+
+
+dry_run: false
+verbose: true
+max_workers: 6
+backup_originals: true
+backup_directory: _backup_originals
+normalize_extensions: true
+sanitize_filenames: true
+translate_filenames: true
+remove_duplicates: true
+process_series: true
+extract_metadata: true
+handle_password_files: true
+extension_mapping:
+  .jpeg: .jpg
+  .tiff: .tif
+  .mpeg: .mpg
+  .m4v: .mp4
+  .htm: .html
+noise_patterns:
+- \[.*?\]
+- \(.*?\)
+- _+
+- -+
+- \s+
+- \.\.+
+series_patterns:
+- (.+?)\s*[vV]ol\.?\s*(\d+)
+- (.+?)\s*[sS]eason\s*(\d+)
+- (.+?)\s*[pP]art\s*(\d+)
+- (.+?)\s*[eE]pisode\s*(\d+)
+- (.+?)\s*[cC]hapter\s*(\d+)
+- (.+?)\s*(\d+)
+file_type_settings:
+  images:
+    extensions:
+    - .jpg
+    - .jpeg
+    - .png
+    - .gif
+    - .bmp
+    - .tiff
+    - .webp
+    extract_metadata: true
+    organize_by_date: true
+    resize_large_images: false
+  videos:
+    extensions:
+    - .mp4
+    - .avi
+    - .mkv
+    - .mov
+    - .wmv
+    - .flv
+    - .webm
+    extract_metadata: true
+    organize_by_date: true
+    compress_large_files: false
+  documents:
+    extensions:
+    - .pdf
+    - .doc
+    - .docx
+    - .txt
+    - .rtf
+    - .odt
+    extract_metadata: true
+    organize_by_type: true
+    ocr_scanned_docs: false
+duplicate_detection:
+  method: size_and_hash
+  hash_algorithm: sha256
+  action: move_to_folder
+  duplicate_folder: _duplicates_found
+  keep_newest: true
+logging:
+  level: INFO
+  log_file: filename_processor.log
+  max_log_size: 20MB
+  backup_count: 10
+translation:
+  enabled: true
+  target_language: en
+  preserve_original: true
+  translation_service: auto

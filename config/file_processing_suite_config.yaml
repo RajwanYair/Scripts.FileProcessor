@@ -1,0 +1,341 @@
+# File Processing Suite v5.0 - Master Configuration
+# ===================================================
+# This is the main configuration file for the Enhanced File Processing Suite
+# All user-configurable settings are centralized here for easy management
+
+# General Application Settings
+general:
+  # Application metadata
+  application_name: "Enhanced File Processing Suite"
+  version: "5.0.0"
+  release_date: "2025-09-04"
+  
+  # Default directories
+  default_source_directory: "./input"
+  default_output_directory: "./output"
+  
+  # Logging configuration
+  log_level: "INFO"  # Options: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  log_file: "file_processing_suite.log"
+  log_max_size_mb: 50
+  log_backup_count: 5
+
+# Performance and Hardware Settings
+performance:
+  # Worker processes/threads
+  max_workers: "auto"  # "auto" for CPU count, or specific number
+  io_workers: 4
+  
+  # GPU acceleration
+  enable_gpu: true
+  gpu_backend: "auto"  # Options: "auto", "cupy", "cuda", "disabled"
+  gpu_memory_limit_gb: 8
+  gpu_batch_size: 1000
+  
+  # Memory management
+  memory_limit_gb: 16
+  enable_memory_monitoring: true
+  
+  # Performance profiling
+  enable_profiling: false
+  profile_output_dir: "./profiles"
+
+# File Format Support Configuration
+formats:
+  # Image formats and settings
+  images:
+    # Supported input formats (200+ formats supported)
+    supported_input: 
+      - "jpg" 
+      - "jpeg"
+      - "png"
+      - "webp"
+      - "tiff"
+      - "gif"
+      - "bmp"
+      - "heic"
+      - "heif"
+      - "raw"
+      - "cr2"
+      - "nef"
+      - "arw"
+      - "svg"
+      - "ico"
+      - "avif"
+    
+    # Default output format for conversions
+    default_output_format: "webp"
+    
+    # Quality settings
+    jpeg_quality: 95
+    webp_quality: 90
+    png_compression: 6
+    
+    # Processing options
+    preserve_metadata: true
+    auto_rotate: true
+    resize_large_images: false
+    max_image_dimension: 4096
+
+  # Document formats
+  documents:
+    supported_input:
+      - "pdf"
+      - "epub"
+      - "mobi"
+      - "txt"
+      - "rtf"
+      - "doc"
+      - "docx"
+      - "odt"
+    default_output_format: "pdf"
+    
+    # PDF settings
+    pdf_compression: true
+    pdf_quality: "high"
+    preserve_bookmarks: true
+
+  # Archive formats
+  archives:
+    supported_input:
+      - "zip"
+      - "rar"
+      - "7z"
+      - "tar"
+      - "gz"
+      - "bz2"
+      - "xz"
+      - "cbz"
+      - "cbr"
+      - "cb7"
+    default_output_format: "zip"
+    compression_level: 6
+
+  # Video formats (basic support)
+  videos:
+    supported_input:
+      - "mp4"
+      - "avi"
+      - "mkv"
+      - "mov"
+      - "wmv"
+      - "flv"
+      - "webm"
+    process_videos: false  # Enable if video processing is needed
+
+# File Organization Settings
+organization:
+  # Directory structure creation
+  create_date_folders: true
+  date_folder_format: "YYYY/MM"  # Options: "YYYY", "YYYY/MM", "YYYY/MM/DD"
+  
+  # File naming
+  preserve_original_names: true
+  normalize_filenames: true
+  remove_special_characters: true
+  max_filename_length: 255
+  
+  # Duplicate handling
+  duplicate_detection: true
+  duplicate_action: "rename"  # Options: "skip", "rename", "replace"
+  hash_algorithm: "md5"  # Options: "md5", "sha1", "sha256"
+  
+  # Series and grouping
+  enable_series_detection: true
+  similarity_threshold: 0.85
+  min_group_size: 2
+
+# GUI Configuration
+gui:
+  # Window settings
+  window_title: "Enhanced File Processing Suite v5.0"
+  window_width: 1200
+  window_height: 800
+  resizable: true
+  
+  # Interface options
+  theme: "system"  # Options: "light", "dark", "system"
+  show_advanced_options: true
+  show_progress_details: true
+  enable_real_time_preview: true
+  
+  # Default tab on startup
+  default_tab: "file_organizer"  # Options: "file_organizer", "format_converter", "archive_processor"
+  
+  # Progress and status
+  update_interval_ms: 100
+  show_file_count: true
+  show_processing_speed: true
+
+# Advanced Features
+advanced:
+  # Metadata extraction
+  extract_metadata: true
+  metadata_output_format: "json"  # Options: "json", "yaml", "xml"
+  include_exif_data: true
+  include_file_hashes: true
+  
+  # Translation support
+  enable_filename_translation: false
+  translation_service: "google"  # Options: "google", "deepl", "offline"
+  target_language: "en"
+  translate_metadata: false
+  
+  # Password-protected files
+  auto_remove_passwords: false
+  password_attempts: 3
+  common_passwords_file: "./common_passwords.txt"
+  
+  # Similarity matching
+  similarity_algorithm: "advanced"  # Options: "basic", "advanced", "gpu"
+  use_content_analysis: true
+  enable_image_similarity: false  # Requires OpenCV
+  
+  # File validation
+  verify_file_integrity: true
+  quarantine_corrupted_files: true
+  quarantine_directory: "./quarantine"
+
+# Security and Safety
+security:
+  # File permissions
+  preserve_permissions: true
+  set_readonly_on_complete: false
+  
+  # Backup settings
+  create_backup_before_processing: false
+  backup_directory: "./backups"
+  backup_retention_days: 30
+  
+  # Scan settings
+  scan_for_malware: false  # Requires additional security tools
+  allowed_file_extensions_only: false
+  block_executable_files: true
+
+# Processing Rules and Filters
+filters:
+  # Size filters
+  min_file_size_bytes: 0
+  max_file_size_bytes: 0  # 0 = no limit
+  
+  # Date filters
+  process_files_newer_than_days: 0  # 0 = no limit
+  process_files_older_than_days: 0  # 0 = no limit
+  
+  # Name filters
+  exclude_patterns:
+    - ".*"  # Hidden files (can be disabled)
+    - "Thumbs.db"
+    - ".DS_Store"
+    - "desktop.ini"
+  
+  include_patterns: []  # Empty = include all (except excluded)
+  
+  # Directory filters
+  exclude_directories:
+    - "__pycache__"
+    - ".git"
+    - ".svn"
+    - "node_modules"
+    - ".vscode"
+
+# Notification and Reporting
+notifications:
+  # Completion notifications
+  show_completion_dialog: true
+  play_completion_sound: false
+  
+  # Progress notifications
+  show_progress_notifications: true
+  notification_interval_files: 100
+  
+  # Reporting
+  generate_processing_report: true
+  report_format: "html"  # Options: "txt", "html", "json", "csv"
+  report_directory: "./reports"
+  include_statistics: true
+  include_error_details: true
+
+# Developer and Debug Settings
+debug:
+  # Debug modes
+  enable_debug_mode: false
+  verbose_logging: false
+  save_intermediate_files: false
+  
+  # Testing
+  dry_run_mode: false  # Preview only, no actual processing
+  limit_files_for_testing: 0  # 0 = no limit
+  
+  # Performance monitoring
+  measure_processing_times: false
+  memory_usage_monitoring: false
+  
+  # Error handling
+  stop_on_first_error: false
+  detailed_error_reporting: true
+  create_error_dumps: false
+
+# External Tool Integration
+external_tools:
+  # Image processing
+  imagemagick_path: ""  # Auto-detect if empty
+  ffmpeg_path: ""       # For video processing
+  
+  # Archive tools
+  winrar_path: ""       # Windows only
+  seven_zip_path: ""    # Cross-platform
+  
+  # Document tools
+  libreoffice_path: ""  # For document conversion
+  
+  # Enable/disable external tools
+  use_external_tools: true
+  prefer_native_processing: true
+
+# Platform-Specific Settings
+platform:
+  # Windows specific
+  windows:
+    use_windows_api: true
+    handle_long_paths: true
+    preserve_alternate_streams: false
+  
+  # Linux/WSL specific
+  linux:
+    preserve_permissions: true
+    follow_symlinks: false
+    use_native_tools: true
+  
+  # macOS specific
+  macos:
+    preserve_resource_forks: false
+    handle_case_sensitivity: true
+
+# Update and Maintenance
+maintenance:
+  # Auto-updates
+  check_for_updates: true
+  auto_download_updates: false
+  update_check_interval_days: 7
+  
+  # Cleanup
+  auto_cleanup_temp_files: true
+  temp_file_retention_hours: 24
+  
+  # Statistics
+  collect_anonymous_statistics: false
+  statistics_server: ""
+
+# Custom User Settings
+# Add your own configuration sections here as needed
+user_custom:
+  # Example custom settings
+  custom_output_naming: ""
+  custom_processing_rules: []
+  favorite_formats: []
+  
+# End of Configuration File
+# =========================
+# For support and documentation, see README.md
+# For advanced configuration, see CONFIGURATION_GUIDE.md

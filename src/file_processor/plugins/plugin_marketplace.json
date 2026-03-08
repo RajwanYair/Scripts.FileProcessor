@@ -1,0 +1,436 @@
+{
+  "marketplace_version": "1.0.0",
+  "last_updated": "2026-01-07T00:00:00Z",
+  "categories": [
+    {
+      "id": "image-processing",
+      "name": "Image Processing",
+      "description": "Plugins for image manipulation, optimization, and analysis",
+      "icon": "🖼️"
+    },
+    {
+      "id": "document-processing",
+      "name": "Document Processing",
+      "description": "PDF, Office, and document manipulation tools",
+      "icon": "📄"
+    },
+    {
+      "id": "text-analysis",
+      "name": "Text Analysis",
+      "description": "NLP, sentiment analysis, and text processing",
+      "icon": "📝"
+    },
+    {
+      "id": "video-processing",
+      "name": "Video Processing",
+      "description": "Video editing, conversion, and extraction",
+      "icon": "🎬"
+    },
+    {
+      "id": "storage",
+      "name": "Cloud Storage",
+      "description": "Integration with cloud storage providers",
+      "icon": "☁️"
+    },
+    {
+      "id": "automation",
+      "name": "Automation & Workflows",
+      "description": "Workflow automation and task scheduling",
+      "icon": "🤖"
+    },
+    {
+      "id": "security",
+      "name": "Security & Privacy",
+      "description": "Encryption, scanning, and privacy tools",
+      "icon": "🔒"
+    },
+    {
+      "id": "ai-ml",
+      "name": "AI & Machine Learning",
+      "description": "AI-powered features and ML models",
+      "icon": "🧠"
+    }
+  ],
+  "featured_plugins": [
+    "com.fileprocessor.image-optimizer",
+    "com.fileprocessor.pdf-processor",
+    "com.fileprocessor.text-analyzer"
+  ],
+  "plugins": [
+    {
+      "id": "com.fileprocessor.image-optimizer",
+      "name": "Image Optimizer Plugin",
+      "version": "1.0.0",
+      "author": "File Processor Team",
+      "description": "Compress, resize, and optimize images with advanced algorithms. Supports JPEG, PNG, WebP, AVIF formats with quality presets and custom dimensions.",
+      "category": "image-processing",
+      "plugin_type": "processor",
+      "status": "official",
+      "featured": true,
+      "downloads": 15420,
+      "rating": 4.8,
+      "reviews": 342,
+      "min_app_version": "7.0.0",
+      "supported_formats": [
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".gif",
+        ".bmp",
+        ".webp",
+        ".tiff"
+      ],
+      "tags": [
+        "image",
+        "optimization",
+        "compression",
+        "resize",
+        "format-conversion"
+      ],
+      "dependencies": {
+        "python": ">=3.9",
+        "packages": [
+          "Pillow>=10.0.0"
+        ]
+      },
+      "documentation_url": "https://docs.fileprocessor.com/plugins/image-optimizer",
+      "repository_url": "https://github.com/fileprocessor/plugins/image-optimizer",
+      "license": "MIT",
+      "install_method": "builtin",
+      "screenshots": [
+        "https://assets.fileprocessor.com/plugins/image-optimizer/screenshot1.png",
+        "https://assets.fileprocessor.com/plugins/image-optimizer/screenshot2.png"
+      ],
+      "changelog": {
+        "1.0.0": "Initial release with compress, resize, format conversion"
+      },
+      "features": [
+        "Lossless and lossy compression",
+        "Smart resize with aspect ratio preservation",
+        "Format conversion (JPEG, PNG, WebP, AVIF)",
+        "Batch processing support",
+        "Quality presets (low, medium, high, max)",
+        "Metadata preservation option"
+      ],
+      "configuration_schema": {
+        "quality": {
+          "type": "integer",
+          "default": 85,
+          "min": 1,
+          "max": 100,
+          "description": "JPEG/WebP compression quality"
+        },
+        "max_width": {
+          "type": "integer",
+          "default": null,
+          "description": "Maximum width in pixels (null for no limit)"
+        },
+        "max_height": {
+          "type": "integer",
+          "default": null,
+          "description": "Maximum height in pixels (null for no limit)"
+        },
+        "preserve_metadata": {
+          "type": "boolean",
+          "default": true,
+          "description": "Keep EXIF metadata"
+        }
+      }
+    },
+    {
+      "id": "com.fileprocessor.pdf-processor",
+      "name": "PDF Processor Plugin",
+      "version": "1.0.0",
+      "author": "File Processor Team",
+      "description": "Comprehensive PDF toolkit for merging, splitting, extracting, and compressing PDF documents. Handles password-protected PDFs and preserves metadata.",
+      "category": "document-processing",
+      "plugin_type": "processor",
+      "status": "official",
+      "featured": true,
+      "downloads": 12850,
+      "rating": 4.7,
+      "reviews": 278,
+      "min_app_version": "7.0.0",
+      "supported_formats": [
+        ".pdf"
+      ],
+      "tags": [
+        "pdf",
+        "merge",
+        "split",
+        "extract",
+        "compress",
+        "document"
+      ],
+      "dependencies": {
+        "python": ">=3.9",
+        "packages": [
+          "PyPDF2>=3.0.0"
+        ]
+      },
+      "documentation_url": "https://docs.fileprocessor.com/plugins/pdf-processor",
+      "repository_url": "https://github.com/fileprocessor/plugins/pdf-processor",
+      "license": "MIT",
+      "install_method": "builtin",
+      "features": [
+        "Merge multiple PDFs into one",
+        "Split PDF by page ranges",
+        "Extract specific pages",
+        "Extract text content",
+        "Compress PDF file size",
+        "Handle encrypted/password PDFs",
+        "Get metadata and page count"
+      ],
+      "configuration_schema": {
+        "password": {
+          "type": "string",
+          "default": null,
+          "description": "Password for encrypted PDFs"
+        },
+        "compression_level": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "default": "medium",
+          "description": "PDF compression level"
+        }
+      }
+    },
+    {
+      "id": "com.fileprocessor.text-analyzer",
+      "name": "Text Analyzer Plugin",
+      "version": "1.0.0",
+      "author": "File Processor Team",
+      "description": "Advanced text analysis with statistics, keyword extraction, sentiment analysis, readability scoring, and pattern detection. Perfect for content analysis and document processing.",
+      "category": "text-analysis",
+      "plugin_type": "analyzer",
+      "status": "official",
+      "featured": true,
+      "downloads": 9640,
+      "rating": 4.6,
+      "reviews": 198,
+      "min_app_version": "7.0.0",
+      "supported_formats": [
+        ".txt",
+        ".md",
+        ".log",
+        ".csv",
+        ".json",
+        ".xml"
+      ],
+      "tags": [
+        "text",
+        "nlp",
+        "sentiment",
+        "keywords",
+        "readability",
+        "analysis"
+      ],
+      "dependencies": {
+        "python": ">=3.9",
+        "packages": []
+      },
+      "documentation_url": "https://docs.fileprocessor.com/plugins/text-analyzer",
+      "repository_url": "https://github.com/fileprocessor/plugins/text-analyzer",
+      "license": "MIT",
+      "install_method": "builtin",
+      "features": [
+        "Text statistics (words, chars, sentences)",
+        "Keyword extraction with frequency analysis",
+        "Sentiment analysis (positive/negative/neutral)",
+        "Readability scoring (Flesch Reading Ease)",
+        "Grade level calculation",
+        "Pattern detection (emails, URLs, dates, phones)",
+        "Lexical diversity analysis"
+      ],
+      "configuration_schema": {
+        "top_keywords": {
+          "type": "integer",
+          "default": 10,
+          "min": 1,
+          "max": 100,
+          "description": "Number of top keywords to extract"
+        },
+        "min_word_length": {
+          "type": "integer",
+          "default": 3,
+          "description": "Minimum word length for keyword extraction"
+        }
+      }
+    },
+    {
+      "id": "com.community.video-transcoder",
+      "name": "Video Transcoder",
+      "version": "2.1.0",
+      "author": "Community Developer",
+      "description": "Professional video transcoding with FFmpeg. Convert between formats, extract audio, create thumbnails, and apply filters.",
+      "category": "video-processing",
+      "plugin_type": "processor",
+      "status": "community",
+      "featured": false,
+      "downloads": 7230,
+      "rating": 4.5,
+      "reviews": 145,
+      "min_app_version": "7.0.0",
+      "supported_formats": [
+        ".mp4",
+        ".avi",
+        ".mkv",
+        ".mov",
+        ".flv",
+        ".wmv"
+      ],
+      "tags": [
+        "video",
+        "transcode",
+        "ffmpeg",
+        "audio",
+        "thumbnail"
+      ],
+      "dependencies": {
+        "python": ">=3.9",
+        "packages": [
+          "ffmpeg-python>=0.2.0"
+        ],
+        "system": [
+          "ffmpeg"
+        ]
+      },
+      "documentation_url": "https://github.com/user/video-transcoder/wiki",
+      "repository_url": "https://github.com/user/video-transcoder",
+      "license": "GPL-3.0",
+      "install_method": "pip",
+      "install_command": "pip install fileprocessor-video-transcoder",
+      "features": [
+        "Format conversion (MP4, MKV, AVI, etc.)",
+        "Audio extraction (MP3, AAC, FLAC)",
+        "Thumbnail generation",
+        "Video filters (brightness, contrast, etc.)",
+        "Resolution scaling",
+        "Hardware acceleration support"
+      ]
+    },
+    {
+      "id": "com.community.cloud-storage",
+      "name": "Cloud Storage Integration",
+      "version": "1.3.2",
+      "author": "CloudSync Team",
+      "description": "Upload and download files from AWS S3, Google Drive, Dropbox, Azure Blob, and more. Automatic sync and backup capabilities.",
+      "category": "storage",
+      "plugin_type": "storage",
+      "status": "community",
+      "featured": false,
+      "downloads": 5820,
+      "rating": 4.4,
+      "reviews": 112,
+      "min_app_version": "7.0.0",
+      "supported_formats": [
+        "*"
+      ],
+      "tags": [
+        "cloud",
+        "storage",
+        "s3",
+        "google-drive",
+        "dropbox",
+        "backup"
+      ],
+      "dependencies": {
+        "python": ">=3.9",
+        "packages": [
+          "boto3>=1.28.0",
+          "google-api-python-client>=2.0.0",
+          "dropbox>=11.0.0"
+        ]
+      },
+      "documentation_url": "https://cloudsync.dev/docs",
+      "repository_url": "https://github.com/cloudsync/fileprocessor-plugin",
+      "license": "Apache-2.0",
+      "install_method": "pip",
+      "install_command": "pip install fileprocessor-cloud-storage",
+      "features": [
+        "AWS S3 integration",
+        "Google Drive sync",
+        "Dropbox upload/download",
+        "Azure Blob Storage",
+        "Automatic backup scheduling",
+        "Resume interrupted transfers"
+      ],
+      "configuration_schema": {
+        "provider": {
+          "type": "string",
+          "enum": [
+            "s3",
+            "google_drive",
+            "dropbox",
+            "azure"
+          ],
+          "description": "Cloud storage provider"
+        },
+        "credentials_path": {
+          "type": "string",
+          "description": "Path to credentials file"
+        }
+      }
+    },
+    {
+      "id": "com.community.ai-image-classifier",
+      "name": "AI Image Classifier",
+      "version": "1.0.0",
+      "author": "AI Lab",
+      "description": "Classify images using pre-trained deep learning models (ResNet, EfficientNet). Auto-tag photos, detect objects, and organize by content.",
+      "category": "ai-ml",
+      "plugin_type": "analyzer",
+      "status": "community",
+      "featured": false,
+      "downloads": 3150,
+      "rating": 4.7,
+      "reviews": 68,
+      "min_app_version": "7.0.0",
+      "supported_formats": [
+        ".jpg",
+        ".jpeg",
+        ".png"
+      ],
+      "tags": [
+        "ai",
+        "machine-learning",
+        "classification",
+        "image-recognition",
+        "tagging"
+      ],
+      "dependencies": {
+        "python": ">=3.9",
+        "packages": [
+          "torch>=2.0.0",
+          "torchvision>=0.15.0",
+          "timm>=0.9.0"
+        ]
+      },
+      "documentation_url": "https://ailab.example/image-classifier",
+      "repository_url": "https://github.com/ailab/image-classifier-plugin",
+      "license": "MIT",
+      "install_method": "pip",
+      "install_command": "pip install fileprocessor-ai-classifier",
+      "features": [
+        "1000+ object classes (ImageNet)",
+        "Multiple model architectures",
+        "GPU acceleration",
+        "Batch processing",
+        "Confidence scoring",
+        "Auto-tagging integration"
+      ],
+      "system_requirements": {
+        "ram": "8GB minimum",
+        "gpu": "Optional but recommended",
+        "disk": "2GB for models"
+      }
+    }
+  ],
+  "plugin_count": 6,
+  "total_downloads": 54110,
+  "average_rating": 4.6
+}

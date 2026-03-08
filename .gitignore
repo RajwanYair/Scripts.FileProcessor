@@ -1,0 +1,111 @@
+# =============================================================================
+# .gitignore — Standard Python / GitHub Project
+# =============================================================================
+
+# --------------- Python bytecode & caches ---------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# --------------- Build outputs ---------------
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+*.whl
+
+# --------------- Testing & coverage ---------------
+.pytest_cache/
+.hypothesis/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+coverage.json
+nosetests.xml
+test-results/
+test_output/
+
+# --------------- Type checkers ---------------
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyright/
+.ruff_cache/
+
+# --------------- Virtual environments ---------------
+venv/
+ENV/
+env/
+.venv/
+.env/
+env.bak/
+
+# --------------- IDE & editors ---------------
+# Track .vscode/ project settings (settings.json, extensions.json, launch.json, tasks.json)
+# but exclude any user-specific or generated sub-files.
+.idea/
+*.swp
+*.swo
+*~
+*.orig
+*.rej
+
+# --------------- Logs & temp files ---------------
+logs/
+*.log
+*.log.*
+*.json.log
+*.tmp
+*.bak
+temp/
+tmp/
+
+# --------------- OS artefacts ---------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# --------------- Secrets & environment vars ---------------
+.env
+.env.*
+*.pem
+*.key
+secrets/
+credentials/
+config/user_config.json
+config/user_config.yaml
+
+# --------------- Project-specific outputs ---------------
+output/
+processed/
+*.bak
+htmlcov/
+
+# --------------- Docker runtime ---------------
+.dockerignore
+
+# --------------- Distribution ---------------
+MANIFEST
+dist/
