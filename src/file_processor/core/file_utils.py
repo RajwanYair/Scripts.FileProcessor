@@ -24,7 +24,7 @@ try:
     TRANSLATION_AVAILABLE = True
 except (ImportError, ModuleNotFoundError):
     TRANSLATION_AVAILABLE = False
-    Translator = None  # type: ignore[assignment,misc]
+    Translator = None
     logger.debug(
         "googletrans not installed — filename translation disabled. "
         "Install with: pip install googletrans==4.0.0rc1"

@@ -85,6 +85,7 @@ X-API-Key: your-api-key-here
 - Enterprise: Custom limits
 """
 
+
 # Application state — avoids mutable global variables
 @dataclass
 class _AppState:
@@ -342,8 +343,6 @@ async def process_file(
     api_key: str = Depends(verify_api_key),
 ):
     """Process a file with specified operation."""
-    global active_jobs
-
     try:
         # Generate job ID
         job_id = str(uuid.uuid4())
