@@ -8,11 +8,11 @@ always deal with a consistent, structured result rather than raw dicts.
 from __future__ import annotations
 
 import csv
-import io
-import json
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import StrEnum
+import io
+import json
 from pathlib import Path
 
 
@@ -128,12 +128,12 @@ class BatchResult:
 
     def to_csv(self) -> str:
         """Serialize each result as a CSV row (header + one row per file)."""
-        _FIELDS = [
+        _fields = [
             "source", "status", "message", "destination",
             "duration_seconds", "bytes_in", "bytes_out", "ok", "timestamp",
         ]
         output = io.StringIO()
-        writer = csv.DictWriter(output, fieldnames=_FIELDS, extrasaction="ignore")
+        writer = csv.DictWriter(output, fieldnames=_fields, extrasaction="ignore")
         writer.writeheader()
         for r in self.results:
             writer.writerow({

@@ -216,7 +216,8 @@ class TestBatchResultExport:
         assert len(lines) == 3  # header + 2 data rows
 
     def test_to_csv_data_values(self, batch: BatchResult) -> None:
-        import csv, io
+        import csv
+        import io
         reader = csv.DictReader(io.StringIO(batch.to_csv()))
         rows = list(reader)
         assert rows[0]["source"] == "a.txt"
