@@ -9,12 +9,12 @@ Defines `ProcessingConfig` (validated config dataclass) and `BaseProcessor`
 from __future__ import annotations
 
 import argparse
-import logging
-import multiprocessing as mp
-import sys
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
+import logging
+import multiprocessing as mp
 from pathlib import Path
+import sys
 from typing import Any
 
 

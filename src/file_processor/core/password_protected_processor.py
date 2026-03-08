@@ -8,6 +8,7 @@ This module provides comprehensive password removal capabilities using external
 tools and libraries, with cross-platform compatibility and graceful fallbacks.
 """
 
+import contextlib
 from dataclasses import dataclass
 from pathlib import Path
 import re
@@ -173,16 +174,13 @@ class PasswordProtectedFileProcessor:
 
     def _is_office_encrypted(self, file_path: Path) -> bool:
         """Check if Office document is encrypted."""
-        try:
+        with contextlib.suppress(Exception), open(file_path, "rb") as f:
             # Try to read the file header to detect encryption
-            with open(file_path, "rb") as f:
-                header = f.read(512)
-                # Office files start with specific signatures
-                # Encrypted files have different patterns
-                if b"EncryptedPackage" in header or b"Microsoft Office Document" in header:
-                    return True
-        except Exception:
-            pass
+            header = f.read(512)
+            # Office files start with specific signatures
+            # Encrypted files have different patterns
+            if b"EncryptedPackage" in header or b"Microsoft Office Document" in header:
+                return True
         return False
 
     def _is_zip_encrypted(self, file_path: Path) -> bool:

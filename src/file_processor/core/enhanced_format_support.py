@@ -15,6 +15,7 @@ Features:
 - Modern format support (AVIF, JXL, WebP2, etc.)
 """
 
+import contextlib
 from dataclasses import dataclass, field
 from enum import Enum
 import mimetypes
@@ -983,13 +984,11 @@ class EnhancedFormatDetector:
 
         # Magic number detection (if available)
         if MAGIC_AVAILABLE:
-            try:
+            with contextlib.suppress(Exception):
                 mime_type = magic.from_file(str(file_path), mime=True)
                 for fmt_info in ENHANCED_FORMAT_REGISTRY.values():
                     if fmt_info.mime_type == mime_type:
                         return fmt_info
-            except Exception:
-                pass
 
         return None
 

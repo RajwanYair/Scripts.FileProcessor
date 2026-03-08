@@ -85,7 +85,7 @@ class HardwareDetector:
                                 kb = int(line.split()[1])
                                 return kb * 1024
                 except Exception:
-                    pass
+                    logger.debug("Failed to read /proc/meminfo", exc_info=True)
             elif platform.system() == "Windows":
                 try:
                     import ctypes
@@ -108,7 +108,7 @@ class HardwareDetector:
                     ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(memory_status))
                     return memory_status.ullTotalPhys
                 except Exception:
-                    pass
+                    logger.debug("Failed to query Windows memory via ctypes", exc_info=True)
 
             # Ultimate fallback - assume 8GB
             return 8 * 1024**3
@@ -125,7 +125,7 @@ class HardwareDetector:
                         src, mnt, fstype = parts[0], parts[1], parts[2]
                         mounts.append((src, mnt, fstype))
         except Exception:
-            pass
+            logger.debug("Failed to parse /proc/mounts", exc_info=True)
         return mounts
 
     @staticmethod
@@ -233,7 +233,7 @@ class HardwareDetector:
                                 if any(keyword in model for keyword in ["ssd", "solid", "nvme"]):
                                     storage_type = "ssd"
                     except Exception:
-                        pass
+                        logger.debug("Failed to read device model for SSD detection", exc_info=True)
 
         if network_fs:
             storage_type = "network"
@@ -283,7 +283,7 @@ class HardwareDetector:
                 elif "4" in output:  # Network drive
                     return "network", True
         except Exception:
-            pass
+            logger.debug("Failed to detect Windows storage type", exc_info=True)
 
         return None, False
 
@@ -305,7 +305,7 @@ class HardwareDetector:
                 elif "network" in output or "mounted from" in output:
                     return "network", True
         except Exception:
-            pass
+            logger.debug("Failed to detect macOS storage type", exc_info=True)
 
         return None, False
 
@@ -349,7 +349,7 @@ class HardwareDetector:
                         except ImportError:
                             pass
         except Exception:
-            pass
+            logger.debug("Failed to detect NVIDIA GPU", exc_info=True)
 
         # Check AMD (if no NVIDIA found)
         if vendor == "none":
@@ -381,7 +381,7 @@ class HardwareDetector:
                         except ImportError:
                             pass
             except Exception:
-                pass
+                logger.debug("Failed to detect AMD GPU", exc_info=True)
 
         # Check Intel (if no discrete GPU found)
         if vendor == "none":

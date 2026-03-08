@@ -164,7 +164,7 @@ def _torch_fallback():
         def tensor(*args, **kwargs):
             raise RuntimeError("PyTorch not available. Install with: pip install torch")
 
-        class cuda:
+        class cuda:  # noqa: N801 — intentional mock of torch.cuda API; must match the upstream interface
             @staticmethod
             def is_available():
                 return False
@@ -216,7 +216,7 @@ def _magic_fallback():
                     "mp3": "audio/mpeg",
                 }
                 return mime_map.get(ext, "application/octet-stream")
-            except Exception:  # noqa: BLE001
+            except Exception:
                 return "application/octet-stream"
 
     return FallbackMagic()

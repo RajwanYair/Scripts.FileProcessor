@@ -205,7 +205,7 @@ class AdvancedFilenameProcessor:
                     result = translator.translate(text, dest="en")
                     text = result.text if hasattr(result, "text") else text
             except Exception:
-                pass  # Continue without translation
+                logger.debug("Translation failed, continuing without translation", exc_info=True)
 
         # Normalize to lowercase and clean special characters
         text = text.lower()
@@ -239,7 +239,7 @@ class GPUSimilarityEngine:
                 logger.info("GPU similarity engine initialized with CuPy")
             except ImportError:
                 if backend == "cupy":
-                    raise ImportError("CuPy not available") from e
+                    raise ImportError("CuPy not available") from None
 
         if self.backend is None and backend in ("auto", "torch"):
             try:
@@ -257,7 +257,7 @@ class GPUSimilarityEngine:
                     logger.info("GPU similarity engine initialized with PyTorch MPS")
             except ImportError:
                 if backend == "torch":
-                    raise ImportError("PyTorch not available") from e
+                    raise ImportError("PyTorch not available") from None
 
         if self.backend is None:
             logger.info("No GPU backend available, falling back to CPU")
@@ -280,7 +280,7 @@ class GPUSimilarityEngine:
     def build_ngram_matrix_numpy(self, texts: list[str], dimension: int = 2048, n: int = 3):
         """Build n-gram matrix using NumPy (CPU fallback)."""
         try:
-            import numpy as np  # noqa: F401
+            import numpy as np
         except ImportError:
             # Pure Python fallback if numpy not available
             logger.warning("NumPy not available, using pure Python implementation")

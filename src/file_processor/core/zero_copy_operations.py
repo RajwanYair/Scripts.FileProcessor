@@ -93,10 +93,10 @@ class ZeroCopyOperations:
             import fcntl
 
             # FICLONE ioctl constant (might not be in fcntl module)
-            FICLONE = getattr(fcntl, "FICLONE", 0x40049409)
+            ficlone = getattr(fcntl, "FICLONE", 0x40049409)
 
             with open(src, "rb") as src_file, open(dst, "wb") as dst_file:
-                fcntl.ioctl(dst_file.fileno(), FICLONE, src_file.fileno())
+                fcntl.ioctl(dst_file.fileno(), ficlone, src_file.fileno())
 
             # Copy metadata
             shutil.copystat(src, dst, follow_symlinks=True)

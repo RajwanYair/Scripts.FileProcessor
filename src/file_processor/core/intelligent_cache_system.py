@@ -170,12 +170,12 @@ class ContentCompressor:
         """Decompress and restore original type."""
         data = zlib.decompress(compressed_data)
 
-        if original_type == str:
+        if original_type is str:
             return data.decode("utf-8")
-        elif original_type == bytes:
+        elif original_type is bytes:
             return data
         else:
-            return pickle.loads(data)
+            return pickle.loads(data)  # noqa: S301 — internal cache; data written by this process only
 
 
 class MemoryCache:
@@ -519,10 +519,18 @@ class DiskCache:
                     # Deserialize value
                     if compressed:
                         metadata = json.loads(metadata_str) if metadata_str else {}
-                        original_type = eval(metadata.get("original_type", "str"))
+                        _type_map = {
+                            "<class 'str'>": str,
+                            "<class 'bytes'>": bytes,
+                            "<class 'int'>": int,
+                            "<class 'float'>": float,
+                            "<class 'list'>": list,
+                            "<class 'dict'>": dict,
+                        }
+                        original_type = _type_map.get(metadata.get("original_type", ""), str)
                         value = ContentCompressor.decompress(value_blob, original_type)
                     else:
-                        value = pickle.loads(value_blob)
+                        value = pickle.loads(value_blob)  # noqa: S301 — internal cache; data written by this process only
 
                     self.stats["hits"] += 1
                     return value
@@ -809,10 +817,8 @@ class IntelligentCacheManager:
 
     def _schedule_warming(self, key: str):
         """Schedule cache warming for predictive loading."""
-        try:
+        with contextlib.suppress(asyncio.QueueFull):
             self.warm_queue.put_nowait(key)
-        except asyncio.QueueFull:
-            pass  # Skip if warming queue is full
 
     async def start_cache_warming(self):
         """Start the cache warming background task."""
@@ -930,7 +936,7 @@ def cleanup_cache_manager():
     global cache_manager
     if cache_manager:
         if cache_manager.warming_task:
-            asyncio.create_task(cache_manager.stop_cache_warming())
+            _task = asyncio.create_task(cache_manager.stop_cache_warming())  # noqa: RUF006 — fire-and-forget cleanup
         cache_manager = None
 
 

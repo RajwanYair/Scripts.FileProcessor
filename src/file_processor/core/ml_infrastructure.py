@@ -362,8 +362,7 @@ class InferenceManager:
             Loaded model or None if failed
         """
         # Check cache
-        if not force_reload:
-            if name in self.model_cache and version in self.model_cache[name]:
+        if not force_reload and name in self.model_cache and version in self.model_cache[name]:
                 logger.info(f"Using cached model {name} v{version}")
                 return self.model_cache[name][version]
 
