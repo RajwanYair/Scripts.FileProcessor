@@ -2,8 +2,8 @@
 
 > General-purpose file processing pipeline — apply transformations, filters, metadata extraction, deduplication, format conversion, and batch operations to any set of files.
 
-[![CI](https://github.com/file-processor/file-processor/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/file-processor/file-processor/actions/workflows/ci-cd.yml)
-[![CodeQL](https://github.com/file-processor/file-processor/actions/workflows/codeql.yml/badge.svg)](https://github.com/file-processor/file-processor/actions/workflows/codeql.yml)
+[![CI](https://github.com/RajwanYair/Scripts.FileProcessor/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/RajwanYair/Scripts.FileProcessor/actions/workflows/ci-cd.yml)
+[![CodeQL](https://github.com/RajwanYair/Scripts.FileProcessor/actions/workflows/codeql.yml/badge.svg)](https://github.com/RajwanYair/Scripts.FileProcessor/actions/workflows/codeql.yml)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)](https://github.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
