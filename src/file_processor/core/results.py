@@ -7,6 +7,9 @@ always deal with a consistent, structured result rather than raw dicts.
 
 from __future__ import annotations
 
+import csv
+import io
+import json
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import StrEnum
@@ -94,3 +97,54 @@ class BatchResult:
             f"{self.skipped} skipped "
             f"in {self.duration_seconds:.2f}s"
         )
+
+    def to_json(self) -> str:
+        """Serialize the batch result to a JSON string."""
+        payload = {
+            "started_at": self.started_at.isoformat(),
+            "finished_at": self.finished_at.isoformat() if self.finished_at else None,
+            "total": self.total,
+            "succeeded": self.succeeded,
+            "failed": self.failed,
+            "skipped": self.skipped,
+            "duration_seconds": self.duration_seconds,
+            "success_rate": self.success_rate,
+            "results": [
+                {
+                    "source": str(r.source),
+                    "status": str(r.status),
+                    "message": r.message,
+                    "destination": str(r.destination) if r.destination else None,
+                    "duration_seconds": r.duration_seconds,
+                    "bytes_in": r.bytes_in,
+                    "bytes_out": r.bytes_out,
+                    "ok": r.ok,
+                    "timestamp": r.timestamp.isoformat(),
+                }
+                for r in self.results
+            ],
+        }
+        return json.dumps(payload)
+
+    def to_csv(self) -> str:
+        """Serialize each result as a CSV row (header + one row per file)."""
+        _FIELDS = [
+            "source", "status", "message", "destination",
+            "duration_seconds", "bytes_in", "bytes_out", "ok", "timestamp",
+        ]
+        output = io.StringIO()
+        writer = csv.DictWriter(output, fieldnames=_FIELDS, extrasaction="ignore")
+        writer.writeheader()
+        for r in self.results:
+            writer.writerow({
+                "source": str(r.source),
+                "status": str(r.status),
+                "message": r.message,
+                "destination": str(r.destination) if r.destination else "",
+                "duration_seconds": r.duration_seconds,
+                "bytes_in": r.bytes_in,
+                "bytes_out": r.bytes_out,
+                "ok": r.ok,
+                "timestamp": r.timestamp.isoformat(),
+            })
+        return output.getvalue()

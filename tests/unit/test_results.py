@@ -118,3 +118,116 @@ class TestBatchResult:
         b.finish()
         s = b.summary()
         assert "0/0 succeeded" in s
+
+
+# ---------------------------------------------------------------------------
+# BatchResult.to_json / to_csv
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.unit
+class TestBatchResultExport:
+    """Tests for the to_json() and to_csv() export methods."""
+
+    @pytest.fixture
+    def batch(self) -> BatchResult:
+        b = BatchResult()
+        b.add(ProcessingResult(
+            source=Path("a.txt"),
+            status=OperationStatus.SUCCESS,
+            message="done",
+            destination=Path("out/a.txt"),
+            duration_seconds=0.5,
+            bytes_in=100,
+            bytes_out=80,
+        ))
+        b.add(ProcessingResult(
+            source=Path("b.txt"),
+            status=OperationStatus.FAILED,
+            message="oops",
+        ))
+        b.finish()
+        return b
+
+    # ── to_json ──────────────────────────────────────────────────────────
+
+    def test_to_json_is_valid_json(self, batch: BatchResult) -> None:
+        import json
+        data = json.loads(batch.to_json())
+        assert isinstance(data, dict)
+
+    def test_to_json_top_level_fields(self, batch: BatchResult) -> None:
+        import json
+        data = json.loads(batch.to_json())
+        assert data["total"] == 2
+        assert data["succeeded"] == 1
+        assert data["failed"] == 1
+        assert data["skipped"] == 0
+        assert "started_at" in data
+        assert "finished_at" in data
+        assert "duration_seconds" in data
+        assert "success_rate" in data
+
+    def test_to_json_results_list(self, batch: BatchResult) -> None:
+        import json
+        data = json.loads(batch.to_json())
+        assert len(data["results"]) == 2
+        first = data["results"][0]
+        assert first["source"] == "a.txt"
+        assert first["status"] == "success"
+        assert first["ok"] is True
+        assert first["destination"] == str(Path("out/a.txt"))
+        assert first["bytes_in"] == 100
+        assert first["bytes_out"] == 80
+
+    def test_to_json_null_destination(self, batch: BatchResult) -> None:
+        import json
+        data = json.loads(batch.to_json())
+        second = data["results"][1]
+        assert second["destination"] is None
+
+    def test_to_json_empty_batch(self) -> None:
+        import json
+        b = BatchResult()
+        b.finish()
+        data = json.loads(b.to_json())
+        assert data["total"] == 0
+        assert data["results"] == []
+
+    def test_to_json_unfinished_batch_has_null_finished_at(self) -> None:
+        import json
+        b = BatchResult()
+        data = json.loads(b.to_json())
+        assert data["finished_at"] is None
+
+    # ── to_csv ───────────────────────────────────────────────────────────
+
+    def test_to_csv_has_header_row(self, batch: BatchResult) -> None:
+        csv_str = batch.to_csv()
+        lines = csv_str.strip().splitlines()
+        header = lines[0]
+        assert "source" in header
+        assert "status" in header
+        assert "ok" in header
+
+    def test_to_csv_correct_row_count(self, batch: BatchResult) -> None:
+        csv_str = batch.to_csv()
+        lines = csv_str.strip().splitlines()
+        assert len(lines) == 3  # header + 2 data rows
+
+    def test_to_csv_data_values(self, batch: BatchResult) -> None:
+        import csv, io
+        reader = csv.DictReader(io.StringIO(batch.to_csv()))
+        rows = list(reader)
+        assert rows[0]["source"] == "a.txt"
+        assert rows[0]["status"] == "success"
+        assert rows[0]["ok"] == "True"
+        assert rows[0]["destination"] == str(Path("out/a.txt"))
+        assert rows[1]["source"] == "b.txt"
+        assert rows[1]["status"] == "failed"
+        assert rows[1]["destination"] == ""  # no destination → empty string
+
+    def test_to_csv_empty_batch_only_header(self) -> None:
+        csv_str = BatchResult().to_csv()
+        lines = csv_str.strip().splitlines()
+        assert len(lines) == 1  # header only

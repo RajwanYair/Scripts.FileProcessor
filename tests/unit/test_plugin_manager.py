@@ -470,9 +470,7 @@ class TestPluginManagerErrorPaths:
 
     # ── uninstall_plugin ───────────────────────────────────────────────────
 
-    def test_uninstall_rmtree_failure_returns_false(
-        self, install_mp: PluginMarketplace
-    ) -> None:
+    def test_uninstall_rmtree_failure_returns_false(self, install_mp: PluginMarketplace) -> None:
         """L202-204: except in uninstall_plugin when shutil.rmtree raises."""
         self._plant(install_mp, "pip-plugin")
         with patch("file_processor.plugins.manager.shutil.rmtree", side_effect=OSError("busy")):
@@ -497,17 +495,13 @@ class TestPluginManagerErrorPaths:
         result = install_mp.list_installed()
         assert "stray-file.txt" not in result
 
-    def test_list_installed_skips_dir_without_manifest(
-        self, install_mp: PluginMarketplace
-    ) -> None:
+    def test_list_installed_skips_dir_without_manifest(self, install_mp: PluginMarketplace) -> None:
         """L245: continue when a plugin directory has no manifest.json."""
         (install_mp.plugins_dir / "no-manifest-dir").mkdir()
         result = install_mp.list_installed()
         assert "no-manifest-dir" not in result
 
-    def test_list_installed_handles_corrupt_manifest(
-        self, install_mp: PluginMarketplace
-    ) -> None:
+    def test_list_installed_handles_corrupt_manifest(self, install_mp: PluginMarketplace) -> None:
         """L252-253: except/fallback when manifest.json is invalid JSON."""
         d = install_mp.plugins_dir / "bad-plugin"
         d.mkdir()
@@ -546,9 +540,7 @@ class TestPluginManagerErrorPaths:
 
     # ── check_updates ──────────────────────────────────────────────────────
 
-    def test_check_updates_skips_plugin_not_in_catalog(
-        self, install_mp: PluginMarketplace
-    ) -> None:
+    def test_check_updates_skips_plugin_not_in_catalog(self, install_mp: PluginMarketplace) -> None:
         """L288: continue when installed plugin ID is absent from catalog."""
         self._plant(install_mp, "orphan-plugin", "1.0.0")
         updates = install_mp.check_updates()

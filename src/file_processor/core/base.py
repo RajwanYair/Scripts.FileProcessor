@@ -9,12 +9,12 @@ Defines `ProcessingConfig` (validated config dataclass) and `BaseProcessor`
 from __future__ import annotations
 
 import argparse
-from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass
 import logging
 import multiprocessing as mp
-from pathlib import Path
 import sys
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 
@@ -137,11 +137,11 @@ class BaseProcessor:
                         results["errors"] += 1
                     results["details"].append(result)
                 except Exception as e:
-                        self.logger.error("Error processing %s: %s", file_path, e)
-                        results["errors"] += 1
-                        results["details"].append(
-                            {"file": str(file_path), "success": False, "error": str(e)}
-                        )
+                    self.logger.error("Error processing %s: %s", file_path, e)
+                    results["errors"] += 1
+                    results["details"].append(
+                        {"file": str(file_path), "success": False, "error": str(e)}
+                    )
         else:
             # Multi-threaded processing
             with ThreadPoolExecutor(max_workers=self.config.workers) as executor:
