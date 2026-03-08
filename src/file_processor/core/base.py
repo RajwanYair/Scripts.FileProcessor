@@ -73,7 +73,7 @@ class BaseProcessor:
             if extensions != ["*"]:
                 ext_match = any(file_path.suffix.lower() == ext.lower() for ext in extensions)
                 if not ext_match:
-                    return False
+                    return False  # pragma: no cover  (rglob pre-filters by ext)
 
             # Check file size if specified
             if self.config.max_file_size:
@@ -137,11 +137,11 @@ class BaseProcessor:
                         results["errors"] += 1
                     results["details"].append(result)
                 except Exception as e:
-                    self.logger.error(f"Error processing {file_path}: {e}")
-                    results["errors"] += 1
-                    results["details"].append(
-                        {"file": str(file_path), "success": False, "error": str(e)}
-                    )
+                        self.logger.error("Error processing %s: %s", file_path, e)
+                        results["errors"] += 1
+                        results["details"].append(
+                            {"file": str(file_path), "success": False, "error": str(e)}
+                        )
         else:
             # Multi-threaded processing
             with ThreadPoolExecutor(max_workers=self.config.workers) as executor:
@@ -157,7 +157,7 @@ class BaseProcessor:
                         results["details"].append(result)
                     except Exception as e:
                         file_path = futures[future]
-                        self.logger.error(f"Error processing {file_path}: {e}")
+                        self.logger.error("Error processing %s: %s", file_path, e)
                         results["errors"] += 1
                         results["details"].append(
                             {"file": str(file_path), "success": False, "error": str(e)}
@@ -234,7 +234,7 @@ def create_config_from_args(args: argparse.Namespace) -> ProcessingConfig:
     )
 
 
-def install_dependencies():
+def install_dependencies():  # pragma: no cover
     """Install required dependencies."""
     import subprocess
 

@@ -340,3 +340,29 @@ class TestCLIHelpers:
         files = processor.get_files()
         results = processor.process_files(files)
         assert results["errors"] == len(files)
+
+    def test_multi_thread_all_fail_counted_as_errors(self, tmp_path: Path) -> None:
+        """Cover line 156: multi-thread path where process_file returns success=False."""
+        (tmp_path / "x.txt").write_text("x", encoding="utf-8")
+        (tmp_path / "y.txt").write_text("y", encoding="utf-8")
+        cfg = ProcessingConfig(source_dir=tmp_path, workers=2)
+        result = _FailProcessor(cfg).process_files([tmp_path / "x.txt", tmp_path / "y.txt"])
+        assert result["errors"] == 2
+        assert result["processed"] == 0
+
+    def test_get_files_skips_on_stat_oserror(self, tmp_path: Path) -> None:
+        """Cover lines 84-85: OSError in stat() inside max_file_size check."""
+        from unittest.mock import MagicMock, patch
+
+        bad_path: MagicMock = MagicMock(spec=Path)
+        bad_path.is_file.return_value = True
+        bad_path.suffix = ".txt"
+        bad_path.stat.side_effect = OSError("permission denied")
+
+        cfg = ProcessingConfig(source_dir=tmp_path, recursive=False, max_file_size=100)
+        processor = BaseProcessor(cfg)
+
+        with patch.object(Path, "glob", return_value=iter([bad_path])):
+            files = processor.get_files()
+
+        assert bad_path not in files
