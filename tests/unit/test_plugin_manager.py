@@ -438,3 +438,118 @@ class TestPluginListAndUpdates:
     def test_check_updates_excludes_up_to_date_plugin(self, install_mp: PluginMarketplace) -> None:
         self._plant(install_mp, "pip-plugin", "1.0.0")
         assert not any(u["id"] == "pip-plugin" for u in install_mp.check_updates())
+
+
+# ---------------------------------------------------------------------------
+# Tests — error-path coverage for remaining uncovered lines
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.unit
+class TestPluginManagerErrorPaths:
+    """Cover exception and edge-case branches that were previously unreachable."""
+
+    def _plant(self, mp: PluginMarketplace, plugin_id: str, version: str = "1.0.0") -> Path:
+        d = mp.plugins_dir / plugin_id.replace(".", "_")
+        d.mkdir(parents=True, exist_ok=True)
+        (d / "manifest.json").write_text(
+            json.dumps({"id": plugin_id, "version": version}), encoding="utf-8"
+        )
+        return d
+
+    # ── get_installed_version ──────────────────────────────────────────────
+
+    def test_get_installed_version_corrupt_manifest_returns_none(
+        self, install_mp: PluginMarketplace
+    ) -> None:
+        """L101-102: except in get_installed_version when manifest is invalid JSON."""
+        d = install_mp.plugins_dir / "pip-plugin"
+        d.mkdir(parents=True, exist_ok=True)
+        (d / "manifest.json").write_text("NOT VALID JSON", encoding="utf-8")
+        assert install_mp.get_installed_version("pip-plugin") is None
+
+    # ── uninstall_plugin ───────────────────────────────────────────────────
+
+    def test_uninstall_rmtree_failure_returns_false(
+        self, install_mp: PluginMarketplace
+    ) -> None:
+        """L202-204: except in uninstall_plugin when shutil.rmtree raises."""
+        self._plant(install_mp, "pip-plugin")
+        with patch("file_processor.plugins.manager.shutil.rmtree", side_effect=OSError("busy")):
+            assert install_mp.uninstall_plugin("pip-plugin") is False
+
+    # ── update_plugin ──────────────────────────────────────────────────────
+
+    def test_update_plugin_installed_but_not_in_catalog_returns_false(
+        self, install_mp: PluginMarketplace
+    ) -> None:
+        """L214-215: update_plugin when plugin is installed but absent from catalog."""
+        self._plant(install_mp, "ghost-plugin")
+        assert install_mp.update_plugin("ghost-plugin") is False
+
+    # ── list_installed ─────────────────────────────────────────────────────
+
+    def test_list_installed_skips_non_directory_entries(
+        self, install_mp: PluginMarketplace
+    ) -> None:
+        """L241: continue when plugins_dir contains a regular file (not a directory)."""
+        (install_mp.plugins_dir / "stray-file.txt").write_text("x", encoding="utf-8")
+        result = install_mp.list_installed()
+        assert "stray-file.txt" not in result
+
+    def test_list_installed_skips_dir_without_manifest(
+        self, install_mp: PluginMarketplace
+    ) -> None:
+        """L245: continue when a plugin directory has no manifest.json."""
+        (install_mp.plugins_dir / "no-manifest-dir").mkdir()
+        result = install_mp.list_installed()
+        assert "no-manifest-dir" not in result
+
+    def test_list_installed_handles_corrupt_manifest(
+        self, install_mp: PluginMarketplace
+    ) -> None:
+        """L252-253: except/fallback when manifest.json is invalid JSON."""
+        d = install_mp.plugins_dir / "bad-plugin"
+        d.mkdir()
+        (d / "manifest.json").write_text("{bad json}", encoding="utf-8")
+        result = install_mp.list_installed()
+        assert "bad-plugin" in result  # falls back to plugin_dir.name
+
+    # ── list_installed_manifests ───────────────────────────────────────────
+
+    def test_list_installed_manifests_skips_non_directory_entries(
+        self, install_mp: PluginMarketplace
+    ) -> None:
+        """L263: continue when plugins_dir entry is not a directory."""
+        (install_mp.plugins_dir / "stray.txt").write_text("x", encoding="utf-8")
+        result = install_mp.list_installed_manifests()
+        assert all(isinstance(m, dict) for m in result)
+
+    def test_list_installed_manifests_skips_dir_without_manifest(
+        self, install_mp: PluginMarketplace
+    ) -> None:
+        """L267: continue when directory has no manifest.json."""
+        (install_mp.plugins_dir / "empty-dir").mkdir()
+        result = install_mp.list_installed_manifests()
+        # directory without manifest is silently skipped
+        assert result == []
+
+    def test_list_installed_manifests_handles_corrupt_manifest(
+        self, install_mp: PluginMarketplace
+    ) -> None:
+        """L273-275: except/warning when manifest.json cannot be parsed."""
+        d = install_mp.plugins_dir / "corrupt-plugin"
+        d.mkdir()
+        (d / "manifest.json").write_text("INVALID", encoding="utf-8")
+        result = install_mp.list_installed_manifests()
+        assert result == []  # corrupt entry is skipped, not included
+
+    # ── check_updates ──────────────────────────────────────────────────────
+
+    def test_check_updates_skips_plugin_not_in_catalog(
+        self, install_mp: PluginMarketplace
+    ) -> None:
+        """L288: continue when installed plugin ID is absent from catalog."""
+        self._plant(install_mp, "orphan-plugin", "1.0.0")
+        updates = install_mp.check_updates()
+        assert not any(u.get("id") == "orphan-plugin" for u in updates)
