@@ -271,3 +271,79 @@ class TestPluginsExtraCommands:
     def test_plugins_list_with_category_filter(self, runner: CliRunner) -> None:
         result = runner.invoke(cli, ["plugins", "list", "--category", "media"])
         assert result.exit_code == 0
+
+    def test_plugins_install_failure_path(self, runner: CliRunner) -> None:
+        """Exercises the else-branch in cmd_plugins_install."""
+        with patch(
+            "file_processor.plugins.manager.PluginMarketplace.install_plugin",
+            return_value=False,
+        ):
+            result = runner.invoke(cli, ["plugins", "install", "any-plugin"])
+        assert result.exit_code == 1
+
+    def test_plugins_install_success_path(self, runner: CliRunner) -> None:
+        """Exercises the success branch in cmd_plugins_install (line 261)."""
+        with patch(
+            "file_processor.plugins.manager.PluginMarketplace.install_plugin",
+            return_value=True,
+        ):
+            result = runner.invoke(cli, ["plugins", "install", "test-plugin"])
+        assert result.exit_code == 0
+        assert "installed" in result.output.lower()
+
+    def test_plugins_remove_failure_path(self, runner: CliRunner) -> None:
+        """Exercises the else-branch in cmd_plugins_remove."""
+        with patch(
+            "file_processor.plugins.manager.PluginMarketplace.remove_plugin",
+            return_value=False,
+        ):
+            result = runner.invoke(cli, ["plugins", "remove", "any-plugin"])
+        assert result.exit_code == 1
+
+    def test_plugins_remove_success_path(self, runner: CliRunner) -> None:
+        """Exercises the success branch in cmd_plugins_remove (line 276)."""
+        with patch(
+            "file_processor.plugins.manager.PluginMarketplace.remove_plugin",
+            return_value=True,
+        ):
+            result = runner.invoke(cli, ["plugins", "remove", "test-plugin"])
+        assert result.exit_code == 0
+        assert "removed" in result.output.lower()
+
+    def test_plugins_list_shows_plugins(self, runner: CliRunner) -> None:
+        """Exercises the for-loop body in cmd_plugins_list (lines 248-249)."""
+        with patch(
+            "file_processor.plugins.manager.PluginMarketplace.list_plugins",
+            return_value=[{"name": "Test Plugin", "description": "A test plugin"}],
+        ):
+            result = runner.invoke(cli, ["plugins", "list"])
+        assert result.exit_code == 0
+        assert "Test Plugin" in result.output
+
+    def test_plugins_update_executes_loop_body(self, runner: CliRunner) -> None:
+        """Exercises the for-loop body in cmd_plugins_update."""
+        with (
+            patch(
+                "file_processor.plugins.manager.PluginMarketplace.list_installed",
+                return_value=["plugin-a"],
+            ),
+            patch(
+                "file_processor.plugins.manager.PluginMarketplace.update_plugin",
+                return_value=True,
+            ),
+        ):
+            result = runner.invoke(cli, ["plugins", "update"])
+        assert result.exit_code == 0
+
+
+# ── serve happy path ───────────────────────────────────────────────────────────
+
+
+@pytest.mark.unit
+class TestServeHappyPath:
+    def test_serve_starts_when_uvicorn_available(self, runner: CliRunner) -> None:
+        """Exercises lines 222-225 (successful uvicorn import + run call)."""
+        with patch("uvicorn.run") as mock_run:
+            result = runner.invoke(cli, ["serve"])
+        assert result.exit_code == 0
+        mock_run.assert_called_once()

@@ -40,10 +40,11 @@
 | 4 | Add `.pre-commit-config.yaml` | ✅ |
 | 5 | Add `.editorconfig` | ✅ |
 | 6 | Fix all `.github/` doc typos and toolchain refs | ✅ |
-| 7 | Write comprehensive test suite (unit + integration + hypothesis) | 🔄 |
-| 8 | Fix `base.py` `sys.path.insert` antipattern | 🔄 |
-| 9 | Add `__main__.py`, `VERSION`, `CITATION.cff` | 🔄 |
-| 10 | `noxfile.py` + `Makefile` for dev automation | 🔄 |
+| 7 | Write comprehensive test suite (unit + integration + hypothesis) | ✅ |
+| 8 | Fix API import paths and Pydantic v2 `Field(examples=[...])` | ✅ |
+| 9 | Boost coverage: `cli/main.py` 100 %, `file_utils.py` 100 %, total 94.5 % | ✅ |
+| 10 | Server: replace global state with `_AppState`; lazy-format all log calls | ✅ |
+| 11 | `noxfile.py` + `Makefile` for dev automation | ✅ |
 
 ---
 

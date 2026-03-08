@@ -25,6 +25,7 @@ Usage:
 
 import asyncio
 from contextlib import asynccontextmanager
+from dataclasses import dataclass, field
 from datetime import datetime
 import logging
 from pathlib import Path
@@ -84,10 +85,17 @@ X-API-Key: your-api-key-here
 - Enterprise: Custom limits
 """
 
-# Global state
-plugin_manager: PluginManager | None = None
-active_jobs: dict[str, dict[str, Any]] = {}
-websocket_connections: list[WebSocket] = []
+# Application state — avoids mutable global variables
+@dataclass
+class _AppState:
+    """Holds all mutable server state in one place."""
+
+    plugin_manager: PluginManager | None = None
+    active_jobs: dict[str, dict[str, Any]] = field(default_factory=dict)
+    websocket_connections: list[WebSocket] = field(default_factory=list)
+
+
+_state = _AppState()
 
 
 @asynccontextmanager
@@ -96,22 +104,21 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("Starting File Processing Suite API Server...")
 
-    global plugin_manager
     plugin_dirs = [
         PROJECT_ROOT / "plugins",
         Path.home() / ".file_processor" / "plugins",
     ]
-    plugin_manager = PluginManager(plugin_dirs, app_version=API_VERSION)
+    _state.plugin_manager = PluginManager(plugin_dirs, app_version=API_VERSION)
 
     # Discover and load plugins
-    plugins = plugin_manager.discover_plugins()
-    logger.info(f"Discovered {len(plugins)} plugins")
+    plugins = _state.plugin_manager.discover_plugins()
+    logger.info("Discovered %d plugins", len(plugins))
 
     for plugin in plugins:
         if plugin.enabled:
-            plugin_manager.load_plugin(plugin.id)
+            _state.plugin_manager.load_plugin(plugin.id)
 
-    logger.info(f"API Server started successfully on v{API_VERSION}")
+    logger.info("API Server started successfully on v%s", API_VERSION)
 
     yield
 
@@ -119,9 +126,9 @@ async def lifespan(app: FastAPI):
     logger.info("Shutting down API Server...")
 
     # Unload all plugins
-    if plugin_manager:
-        for plugin_id in list(plugin_manager.plugins.keys()):
-            plugin_manager.unload_plugin(plugin_id)
+    if _state.plugin_manager:
+        for plugin_id in list(_state.plugin_manager.plugins.keys()):
+            _state.plugin_manager.unload_plugin(plugin_id)
 
     logger.info("API Server shutdown complete")
 
@@ -233,27 +240,23 @@ async def root():
 @app.get("/health", response_model=HealthResponse, tags=["General"])
 async def health_check():
     """Health check endpoint."""
-    global plugin_manager
-
     return HealthResponse(
         status="healthy",
         version=API_VERSION,
         timestamp=datetime.now(),
         uptime_seconds=0.0,  # TODO: Track actual uptime
-        plugins_loaded=len(plugin_manager.plugins) if plugin_manager else 0,
+        plugins_loaded=len(_state.plugin_manager.plugins) if _state.plugin_manager else 0,
     )
 
 
 @app.get("/api/v1/plugins", response_model=list[PluginInfo], tags=["Plugins"])
 async def list_plugins(api_key: str = Depends(verify_api_key)):
     """List all available plugins."""
-    global plugin_manager
-
-    if not plugin_manager:
+    if not _state.plugin_manager:
         raise HTTPException(status_code=500, detail="Plugin manager not initialized")
 
     plugins_info = []
-    for plugin_id, instance in plugin_manager.plugins.items():
+    for plugin_id, instance in _state.plugin_manager.plugins.items():
         plugins_info.append(
             PluginInfo(
                 id=plugin_id,
@@ -272,15 +275,13 @@ async def list_plugins(api_key: str = Depends(verify_api_key)):
 @app.get("/api/v1/plugins/{plugin_id}", response_model=PluginInfo, tags=["Plugins"])
 async def get_plugin(plugin_id: str, api_key: str = Depends(verify_api_key)):
     """Get details of a specific plugin."""
-    global plugin_manager
-
-    if not plugin_manager:
+    if not _state.plugin_manager:
         raise HTTPException(status_code=500, detail="Plugin manager not initialized")
 
-    if plugin_id not in plugin_manager.plugins:
+    if plugin_id not in _state.plugin_manager.plugins:
         raise HTTPException(status_code=404, detail=f"Plugin not found: {plugin_id}")
 
-    instance = plugin_manager.plugins[plugin_id]
+    instance = _state.plugin_manager.plugins[plugin_id]
     return PluginInfo(
         id=plugin_id,
         name=instance.metadata.name,
@@ -295,12 +296,10 @@ async def get_plugin(plugin_id: str, api_key: str = Depends(verify_api_key)):
 @app.post("/api/v1/plugins/{plugin_id}/reload", tags=["Plugins"])
 async def reload_plugin(plugin_id: str, api_key: str = Depends(verify_api_key)):
     """Reload a plugin (hot-reload)."""
-    global plugin_manager
-
-    if not plugin_manager:
+    if not _state.plugin_manager:
         raise HTTPException(status_code=500, detail="Plugin manager not initialized")
 
-    if plugin_manager.reload_plugin(plugin_id):
+    if _state.plugin_manager.reload_plugin(plugin_id):
         return {"message": f"Plugin {plugin_id} reloaded successfully"}
     else:
         raise HTTPException(status_code=500, detail=f"Failed to reload plugin: {plugin_id}")
@@ -331,7 +330,7 @@ async def upload_file(file: UploadFile = File(...), api_key: str = Depends(verif
             "message": "File uploaded successfully",
         }
     except Exception as e:
-        logger.error(f"File upload failed: {e}")
+        logger.error("File upload failed: %s", e)
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 
@@ -371,7 +370,7 @@ async def process_file(
             "result": None,
             "error": None,
         }
-        active_jobs[job_id] = job
+        _state.active_jobs[job_id] = job
 
         # Queue processing in background
         background_tasks.add_task(
@@ -392,7 +391,7 @@ async def process_file(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Processing request failed: {e}")
+        logger.error("Processing request failed: %s", e)
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 
@@ -400,32 +399,30 @@ async def process_file_background(
     job_id: str, file_path: Path, operation: str, options: dict[str, Any]
 ):
     """Background task to process file."""
-    global active_jobs, plugin_manager
-
     try:
-        logger.info(f"Starting background processing for job {job_id}")
+        logger.info("Starting background processing for job %s", job_id)
 
         # Simulate processing (replace with actual plugin processing)
         await asyncio.sleep(2)  # Simulate work
 
         # Update job status
-        active_jobs[job_id]["status"] = "completed"
-        active_jobs[job_id]["result"] = {
+        _state.active_jobs[job_id]["status"] = "completed"
+        _state.active_jobs[job_id]["result"] = {
             "success": True,
             "operation": operation,
             "file": str(file_path),
             "processed_at": datetime.now().isoformat(),
         }
 
-        logger.info(f"Completed processing for job {job_id}")
+        logger.info("Completed processing for job %s", job_id)
 
         # Notify WebSocket clients
-        await broadcast_job_update(job_id, active_jobs[job_id])
+        await broadcast_job_update(job_id, _state.active_jobs[job_id])
 
     except Exception as e:
-        logger.error(f"Background processing failed for job {job_id}: {e}")
-        active_jobs[job_id]["status"] = "failed"
-        active_jobs[job_id]["error"] = str(e)
+        logger.error("Background processing failed for job %s: %s", job_id, e)
+        _state.active_jobs[job_id]["status"] = "failed"
+        _state.active_jobs[job_id]["error"] = str(e)
 
 
 @app.get("/api/v1/marketplace/plugins", tags=["Marketplace"])
@@ -452,7 +449,7 @@ async def list_marketplace_plugins(
             "timestamp": datetime.now().isoformat(),
         }
     except Exception as e:
-        logger.error(f"Failed to list marketplace plugins: {e}")
+        logger.error("Failed to list marketplace plugins: %s", e)
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 
@@ -476,7 +473,7 @@ async def search_marketplace_plugins(
             "timestamp": datetime.now().isoformat(),
         }
     except Exception as e:
-        logger.error(f"Failed to search marketplace: {e}")
+        logger.error("Failed to search marketplace: %s", e)
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 
@@ -505,7 +502,7 @@ async def get_marketplace_plugin_info(plugin_id: str, api_key: str = Depends(ver
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Failed to get plugin info: {e}")
+        logger.error("Failed to get plugin info: %s", e)
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 
@@ -524,9 +521,8 @@ async def install_marketplace_plugin(
 
         if success:
             # Reload plugin manager to pick up the new plugin
-            global plugin_manager
-            if plugin_manager:
-                plugin_manager.discover_plugins()
+            if _state.plugin_manager:
+                _state.plugin_manager.discover_plugins()
 
             return {
                 "success": True,
@@ -539,7 +535,7 @@ async def install_marketplace_plugin(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Failed to install plugin: {e}")
+        logger.error("Failed to install plugin: %s", e)
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 
@@ -554,9 +550,8 @@ async def uninstall_marketplace_plugin(plugin_id: str, api_key: str = Depends(ve
 
         if success:
             # Reload plugin manager
-            global plugin_manager
-            if plugin_manager:
-                plugin_manager.unload_plugin(plugin_id)
+            if _state.plugin_manager:
+                _state.plugin_manager.unload_plugin(plugin_id)
 
             return {
                 "success": True,
@@ -569,7 +564,7 @@ async def uninstall_marketplace_plugin(plugin_id: str, api_key: str = Depends(ve
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Failed to uninstall plugin: {e}")
+        logger.error("Failed to uninstall plugin: %s", e)
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 
@@ -590,7 +585,7 @@ async def check_marketplace_updates(api_key: str = Depends(verify_api_key)):
             "timestamp": datetime.now().isoformat(),
         }
     except Exception as e:
-        logger.error(f"Failed to check updates: {e}")
+        logger.error("Failed to check updates: %s", e)
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 
@@ -617,19 +612,17 @@ async def list_marketplace_categories(api_key: str = Depends(verify_api_key)):
             "timestamp": datetime.now().isoformat(),
         }
     except Exception as e:
-        logger.error(f"Failed to list categories: {e}")
+        logger.error("Failed to list categories: %s", e)
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @app.get("/api/v1/jobs/{job_id}", response_model=ProcessingResponse, tags=["Processing"])
 async def get_job_status(job_id: str, api_key: str = Depends(verify_api_key)):
     """Get status of a processing job."""
-    global active_jobs
-
-    if job_id not in active_jobs:
+    if job_id not in _state.active_jobs:
         raise HTTPException(status_code=404, detail=f"Job not found: {job_id}")
 
-    job = active_jobs[job_id]
+    job = _state.active_jobs[job_id]
     return ProcessingResponse(
         job_id=job_id,
         status=job["status"],
@@ -668,10 +661,8 @@ async def batch_process(
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     """WebSocket endpoint for real-time updates."""
-    global websocket_connections
-
     await websocket.accept()
-    websocket_connections.append(websocket)
+    _state.websocket_connections.append(websocket)
 
     try:
         while True:
@@ -687,13 +678,11 @@ async def websocket_endpoint(websocket: WebSocket):
                 }
             )
     except WebSocketDisconnect:
-        websocket_connections.remove(websocket)
+        _state.websocket_connections.remove(websocket)
 
 
 async def broadcast_job_update(job_id: str, job_data: dict[str, Any]):
     """Broadcast job update to all connected WebSocket clients."""
-    global websocket_connections
-
     message = {
         "type": "job_update",
         "job_id": job_id,
@@ -702,7 +691,7 @@ async def broadcast_job_update(job_id: str, job_data: dict[str, Any]):
     }
 
     disconnected = []
-    for websocket in websocket_connections:
+    for websocket in _state.websocket_connections:
         try:
             await websocket.send_json(message)
         except Exception:
@@ -710,7 +699,7 @@ async def broadcast_job_update(job_id: str, job_data: dict[str, Any]):
 
     # Remove disconnected clients
     for websocket in disconnected:
-        websocket_connections.remove(websocket)
+        _state.websocket_connections.remove(websocket)
 
 
 # ============================================================================
@@ -734,7 +723,7 @@ async def http_exception_handler(request, exc):
 @app.exception_handler(Exception)
 async def general_exception_handler(request, exc):
     """General exception handler."""
-    logger.error(f"Unhandled exception: {exc}", exc_info=True)
+    logger.error("Unhandled exception: %s", exc, exc_info=True)
     return JSONResponse(
         status_code=500,
         content={

@@ -188,3 +188,43 @@ class TestTranslateFilename:
         result = translate_filename("a__b.txt", translator=_Translator())
         # Just check no crash and extension preserved
         assert result.endswith(".txt")
+
+    def test_empty_leading_segment_triggers_continue(self, monkeypatch) -> None:
+        """Leading delimiter produces an empty word; the `continue` branch is exercised."""
+        from file_processor.core import file_utils
+
+        monkeypatch.setattr(file_utils, "TRANSLATION_AVAILABLE", True)
+
+        class _Result:
+            text = "cat"
+
+        class _Translator:
+            def translate(self, word, dest="en"):
+                return _Result()
+
+        # "_猫" splits to ["", "猫"]; the empty string hits the `continue` branch
+        result = translate_filename("_猫.jpg", translator=_Translator())
+        assert result.endswith(".jpg")
+
+
+# ── googletrans import-failure path ───────────────────────────────────────────
+
+
+@pytest.mark.unit
+class TestGoogletransImportFailure:
+    def test_translation_disabled_when_googletrans_blocked(self) -> None:
+        """Cover the except-block (lines 25-28) by blocking the googletrans import."""
+        import importlib
+        import sys
+        from unittest.mock import patch
+
+        from file_processor.core import file_utils
+
+        # sys.modules[key] = None tells Python to raise ImportError on import attempts.
+        with patch.dict(sys.modules, {"googletrans": None}):
+            importlib.reload(file_utils)
+            assert file_utils.TRANSLATION_AVAILABLE is False
+            assert file_utils.Translator is None
+
+        # Restore the module to its original (googletrans-enabled) state.
+        importlib.reload(file_utils)

@@ -145,7 +145,7 @@ line-ending = "lf"
 # =============================================================================
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.11"
 # Start with standard and tighten per-project
 warn_return_any = true
 warn_unused_configs = true
@@ -213,7 +213,7 @@ addopts = [
     "--cov=src/file_processor",
     "--cov-report=term-missing",
     "--cov-report=xml",
-    "--cov-fail-under=70",
+    "--cov-fail-under=90",
 ]
 asyncio_mode = "auto"
 markers = [
@@ -306,7 +306,7 @@ output = "coverage.xml"
 
 [tool.black]
 line-length = 100
-target-version = ["py39", "py310", "py311", "py312", "py313"]
+target-version = ["py311", "py312", "py313"]
 include = '\\.pyi?$'
 extend-exclude = '''
 /(

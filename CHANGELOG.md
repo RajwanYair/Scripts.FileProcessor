@@ -26,6 +26,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `src/file_processor/utils/config_loader.py` — YAML config with env-var substitution
 - Full test suite: `tests/conftest.py`, unit tests, integration tests, hypothesis tests
 - `docs/ARCHITECTURE.md` — system architecture document
+- `_AppState` dataclass in `api/server.py` — replaces three mutable module globals
+- `tests/unit/test_base.py` — 12 new tests for `process_files` (single/multi-thread,
+  dry-run, exception handling) and CLI helpers (`setup_common_arguments`,
+  `create_config_from_args`)
+- `tests/unit/test_plugin_manager.py` — 35 new tests covering `install_plugin`
+  (pip/git/builtin, force, failures), `uninstall_plugin`, `update_plugin`,
+  `list_installed_manifests`, `check_updates`
+- `tests/unit/test_cli.py` — 7 new tests for all CLI command branches; `cli/main.py`
+  now at **100 % line coverage**
+- `tests/unit/test_file_utils.py` — 2 new tests: empty-word `continue` branch and
+  googletrans-import-failure path; `file_utils.py` now at **100 % line coverage**
 
 ### Changed
 
@@ -42,6 +53,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `SECURITY.md` — covered versions updated to 7.x; private-reporting instructions added
 - `Dockerfile` — corrected `requirements.txt` path and CMD entry point
 - `docker-compose.yml` — updated service entry point
+- `api/server.py` — all `global` declarations removed; replaced with `_AppState`
+  dataclass; all f-string logging calls converted to lazy `%s` format
+- `src/file_processor/api/server.py` — `from plugin_manager import` → correct absolute
+  import `from file_processor.plugins.manager import PluginMarketplace`
+- `src/file_processor/api/server.py` — Pydantic v2: `Field(example=...)` →
+  `Field(examples=[...])`
+- `.vscode/settings.json` — removed conflicting `python.analysis.*` keys; proxy set to
+  `http://proxy-dmz.intel.com:912`
+- `pyproject.toml` — `[tool.mypy] python_version` corrected from `"3.9"` to `"3.11"`
+  (matches `requires-python = ">=3.11"`); `[tool.black] target-version` aligned to
+  `py311+`; coverage threshold raised from 70 % to **90 %**
+
+### Coverage snapshot (213 tests)
+
+| Module | Coverage |
+|--------|----------|
+| `cli/main.py` | **100 %** |
+| `core/file_utils.py` | **100 %** |
+| `core/processor.py` | **100 %** |
+| `core/results.py` | **100 %** |
+| `plugins/manager.py` | 91 % |
+| `core/base.py` | 88 % |
+| **Total** | **94.5 %** |
 
 ## [7.0.0] - 2026-01-07
 

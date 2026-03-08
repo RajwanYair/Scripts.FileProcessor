@@ -7,7 +7,12 @@ from pathlib import Path
 
 import pytest
 
-from file_processor.core.base import BaseProcessor, ProcessingConfig
+from file_processor.core.base import (
+    BaseProcessor,
+    ProcessingConfig,
+    create_config_from_args,
+    setup_common_arguments,
+)
 
 
 @pytest.mark.unit
@@ -98,6 +103,170 @@ class TestBaseProcessor:
         assert result["success"] is True
         assert result["action"] == "would_process"
         assert "a.txt" in result["message"]
+
+
+# ── Concrete processor stubs for process_files tests ──────────────────────────
+
+
+class _SucceedProcessor(BaseProcessor):
+    """Test stub: always returns success."""
+
+    def process_file(self, file_path: Path) -> dict:
+        return {"success": True, "file": str(file_path)}
+
+
+class _FailProcessor(BaseProcessor):
+    """Test stub: always returns failure without raising."""
+
+    def process_file(self, file_path: Path) -> dict:
+        return {"success": False, "file": str(file_path)}
+
+
+class _RaiseProcessor(BaseProcessor):
+    """Test stub: always raises ValueError."""
+
+    def process_file(self, file_path: Path) -> dict:
+        raise ValueError(f"simulated error on {file_path.name}")
+
+
+# ── process_files coverage ─────────────────────────────────────────────────────
+
+
+@pytest.mark.unit
+class TestProcessFiles:
+    def test_single_thread_all_succeed(self, source_dir: Path) -> None:
+        cfg = ProcessingConfig(source_dir=source_dir, workers=1)
+        proc = _SucceedProcessor(cfg)
+        files = proc.get_files()
+        result = proc.process_files(files)
+        assert result["processed"] == len(files)
+        assert result["errors"] == 0
+
+    def test_single_thread_all_fail(self, source_dir: Path) -> None:
+        cfg = ProcessingConfig(source_dir=source_dir, workers=1)
+        proc = _FailProcessor(cfg)
+        files = proc.get_files()
+        result = proc.process_files(files)
+        assert result["errors"] == len(files)
+        assert result["processed"] == 0
+
+    def test_single_thread_exception_counted_as_error(self, tmp_path: Path) -> None:
+        (tmp_path / "x.txt").write_text("x", encoding="utf-8")
+        cfg = ProcessingConfig(source_dir=tmp_path, workers=1)
+        proc = _RaiseProcessor(cfg)
+        result = proc.process_files([tmp_path / "x.txt"])
+        assert result["errors"] == 1
+        assert result["details"][0]["success"] is False
+        assert "simulated error" in result["details"][0]["error"]
+
+    def test_multi_thread_all_succeed(self, source_dir: Path) -> None:
+        cfg = ProcessingConfig(source_dir=source_dir, workers=2)
+        proc = _SucceedProcessor(cfg)
+        files = proc.get_files()
+        result = proc.process_files(files)
+        assert result["processed"] == len(files)
+        assert result["errors"] == 0
+
+    def test_multi_thread_exception_counted_as_error(self, tmp_path: Path) -> None:
+        (tmp_path / "x.txt").write_text("x", encoding="utf-8")
+        cfg = ProcessingConfig(source_dir=tmp_path, workers=2)
+        proc = _RaiseProcessor(cfg)
+        result = proc.process_files([tmp_path / "x.txt"])
+        assert result["errors"] == 1
+
+    def test_dry_run_calls_simulate_process(self, tmp_path: Path) -> None:
+        (tmp_path / "a.txt").write_text("hello", encoding="utf-8")
+        cfg = ProcessingConfig(source_dir=tmp_path, dry_run=True)
+        proc = BaseProcessor(cfg)
+        result = proc.process_files([tmp_path / "a.txt"])
+        assert len(result["details"]) == 1
+        assert result["details"][0]["action"] == "would_process"
+
+    def test_empty_file_list_returns_zero_counts(self, tmp_path: Path) -> None:
+        cfg = ProcessingConfig(source_dir=tmp_path, workers=1)
+        result = _SucceedProcessor(cfg).process_files([])
+        assert result["processed"] == 0
+        assert result["errors"] == 0
+        assert result["details"] == []
+
+
+# ── setup_common_arguments / create_config_from_args ──────────────────────────
+
+
+@pytest.mark.unit
+class TestCLIHelpers:
+    def test_setup_common_arguments_accepts_sourcedir(self, tmp_path: Path) -> None:
+        import argparse
+
+        parser = argparse.ArgumentParser()
+        setup_common_arguments(parser)
+        args = parser.parse_args(["--sourcedir", str(tmp_path)])
+        assert args.sourcedir == str(tmp_path)
+
+    def test_setup_common_arguments_defaults(self, tmp_path: Path) -> None:
+        import argparse
+
+        parser = argparse.ArgumentParser()
+        setup_common_arguments(parser)
+        args = parser.parse_args(["--sourcedir", str(tmp_path)])
+        assert args.recursive is False
+        assert args.overwrite is False
+        assert args.dry_run is False
+        assert args.verbose is False
+        assert args.quality == 85
+
+    def test_setup_common_arguments_boolean_flags(self, tmp_path: Path) -> None:
+        import argparse
+
+        parser = argparse.ArgumentParser()
+        setup_common_arguments(parser)
+        args = parser.parse_args(
+            ["--sourcedir", str(tmp_path), "--recursive", "--overwrite", "--dry-run", "--verbose"]
+        )
+        assert args.recursive is True
+        assert args.overwrite is True
+        assert args.dry_run is True
+        assert args.verbose is True
+
+    def test_create_config_no_extensions(self, tmp_path: Path) -> None:
+        import argparse
+
+        parser = argparse.ArgumentParser()
+        setup_common_arguments(parser)
+        args = parser.parse_args(["--sourcedir", str(tmp_path)])
+        cfg = create_config_from_args(args)
+        assert cfg.file_extensions is None
+
+    def test_create_config_extensions_with_dots(self, tmp_path: Path) -> None:
+        import argparse
+
+        parser = argparse.ArgumentParser()
+        setup_common_arguments(parser)
+        args = parser.parse_args(["--sourcedir", str(tmp_path), "--extensions", ".txt,.jpg"])
+        cfg = create_config_from_args(args)
+        assert ".txt" in (cfg.file_extensions or [])
+        assert ".jpg" in (cfg.file_extensions or [])
+
+    def test_create_config_extensions_without_dots_prefixed(self, tmp_path: Path) -> None:
+        import argparse
+
+        parser = argparse.ArgumentParser()
+        setup_common_arguments(parser)
+        args = parser.parse_args(["--sourcedir", str(tmp_path), "--extensions", "txt,jpg"])
+        cfg = create_config_from_args(args)
+        # Dots must be prepended automatically
+        assert ".txt" in (cfg.file_extensions or [])
+        assert ".jpg" in (cfg.file_extensions or [])
+
+    def test_create_config_mixed_extensions(self, tmp_path: Path) -> None:
+        import argparse
+
+        parser = argparse.ArgumentParser()
+        setup_common_arguments(parser)
+        args = parser.parse_args(["--sourcedir", str(tmp_path), "--extensions", "txt,.jpg"])
+        cfg = create_config_from_args(args)
+        assert ".txt" in (cfg.file_extensions or [])
+        assert ".jpg" in (cfg.file_extensions or [])
 
     def test_simulate_process_returns_size(self, source_dir: Path) -> None:
         from file_processor.core.base import ProcessingConfig
