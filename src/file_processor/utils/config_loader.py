@@ -87,3 +87,26 @@ def load_config(user_config: Path | None = None) -> dict[str, Any]:
     if user_config:
         config = _deep_merge(config, load_yaml(user_config))
     return config
+
+
+def merge_configs(*paths: Path) -> dict[str, Any]:
+    """
+    Load and deep-merge an arbitrary number of YAML config files.
+
+    Files are applied left-to-right; later files override earlier ones.
+    Missing files are silently skipped (load_yaml returns ``{}`` for them).
+
+    Parameters
+    ----------
+    *paths:
+        One or more paths to YAML config files.
+
+    Returns
+    -------
+    dict
+        Merged configuration dictionary (env vars substituted).
+    """
+    result: dict[str, Any] = {}
+    for path in paths:
+        result = _deep_merge(result, load_yaml(path))
+    return result

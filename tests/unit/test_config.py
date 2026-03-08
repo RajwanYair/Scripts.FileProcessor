@@ -7,7 +7,13 @@ from typing import Any
 
 import pytest
 
-from file_processor.utils.config_loader import _deep_merge, _substitute_env, load_config, load_yaml
+from file_processor.utils.config_loader import (
+    _deep_merge,
+    _substitute_env,
+    load_config,
+    load_yaml,
+    merge_configs,
+)
 
 # ── _substitute_env ────────────────────────────────────────────────────────────
 
@@ -133,3 +139,50 @@ class TestLoadConfig:
     def test_nonexistent_user_config_falls_back_to_default(self, tmp_path: Path) -> None:
         config = load_config(user_config=tmp_path / "nope.yaml")
         assert isinstance(config, dict)  # No exception; falls back gracefully
+
+
+# ── merge_configs ──────────────────────────────────────────────────────────────
+
+
+@pytest.mark.unit
+class TestMergeConfigs:
+    def _write(self, path: Path, content: str) -> Path:
+        path.write_text(content, encoding="utf-8")
+        return path
+
+    def test_single_file_returned_as_is(self, tmp_path: Path) -> None:
+        f = self._write(tmp_path / "a.yaml", "x: 1\ny: 2\n")
+        result = merge_configs(f)
+        assert result == {"x": 1, "y": 2}
+
+    def test_later_file_overrides_earlier(self, tmp_path: Path) -> None:
+        a = self._write(tmp_path / "a.yaml", "level: info\nport: 8080\n")
+        b = self._write(tmp_path / "b.yaml", "level: debug\n")
+        result = merge_configs(a, b)
+        assert result["level"] == "debug"
+        assert result["port"] == 8080  # preserved from first file
+
+    def test_nested_keys_merged_recursively(self, tmp_path: Path) -> None:
+        a = self._write(tmp_path / "a.yaml", "db:\n  host: localhost\n  port: 5432\n")
+        b = self._write(tmp_path / "b.yaml", "db:\n  port: 5433\n")
+        result = merge_configs(a, b)
+        assert result["db"]["host"] == "localhost"
+        assert result["db"]["port"] == 5433
+
+    def test_missing_file_silently_skipped(self, tmp_path: Path) -> None:
+        a = self._write(tmp_path / "a.yaml", "key: value\n")
+        missing = tmp_path / "missing.yaml"
+        result = merge_configs(a, missing)
+        assert result == {"key": "value"}
+
+    def test_no_args_returns_empty_dict(self) -> None:
+        assert merge_configs() == {}
+
+    def test_three_file_merge_order(self, tmp_path: Path) -> None:
+        a = self._write(tmp_path / "a.yaml", "x: 1\ny: 1\nz: 1\n")
+        b = self._write(tmp_path / "b.yaml", "x: 2\ny: 2\n")
+        c = self._write(tmp_path / "c.yaml", "x: 3\n")
+        result = merge_configs(a, b, c)
+        assert result["x"] == 3  # last wins
+        assert result["y"] == 2  # second wins over first
+        assert result["z"] == 1  # only in first, preserved
