@@ -16,10 +16,10 @@ Features:
 """
 
 import contextlib
-import mimetypes
-import os
 from dataclasses import dataclass, field
 from enum import Enum
+import mimetypes
+import os
 from pathlib import Path
 
 # Optional imports for enhanced detection

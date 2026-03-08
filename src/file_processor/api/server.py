@@ -167,8 +167,8 @@ async def verify_api_key(api_key: str = Depends(API_KEY_HEADER)):
 class HealthResponse(BaseModel):
     """Health check response."""
 
-    status: str = Field(..., example="healthy")
-    version: str = Field(..., example="1.0.0")
+    status: str = Field(..., examples=["healthy"])
+    version: str = Field(..., examples=["1.0.0"])
     timestamp: datetime
     uptime_seconds: float
     plugins_loaded: int
@@ -178,16 +178,16 @@ class ProcessingRequest(BaseModel):
     """Request model for file processing."""
 
     operation: str = Field(
-        ..., example="optimize_image", description="Processing operation to perform"
+        ..., examples=["optimize_image"], description="Processing operation to perform"
     )
-    options: dict[str, Any] = Field(default_factory=dict, example={"quality": 85})
+    options: dict[str, Any] = Field(default_factory=dict, examples=[{"quality": 85}])
 
 
 class ProcessingResponse(BaseModel):
     """Response model for file processing."""
 
-    job_id: str = Field(..., example="550e8400-e29b-41d4-a716-446655440000")
-    status: str = Field(..., example="processing")
+    job_id: str = Field(..., examples=["550e8400-e29b-41d4-a716-446655440000"])
+    status: str = Field(..., examples=["processing"])
     message: str
     created_at: datetime
     result: dict[str, Any] | None = None
@@ -437,7 +437,7 @@ async def list_marketplace_plugins(
 ):
     """List plugins available in the marketplace."""
     try:
-        from plugin_manager import PluginMarketplace
+        from file_processor.plugins.manager import PluginMarketplace
 
         marketplace = PluginMarketplace()
         plugins = marketplace.list_plugins(category=category, status=status)
@@ -463,7 +463,7 @@ async def search_marketplace_plugins(
 ):
     """Search plugins in the marketplace."""
     try:
-        from plugin_manager import PluginMarketplace
+        from file_processor.plugins.manager import PluginMarketplace
 
         marketplace = PluginMarketplace()
         results = marketplace.search_plugins(q)
@@ -484,7 +484,7 @@ async def search_marketplace_plugins(
 async def get_marketplace_plugin_info(plugin_id: str, api_key: str = Depends(verify_api_key)):
     """Get detailed information about a marketplace plugin."""
     try:
-        from plugin_manager import PluginMarketplace
+        from file_processor.plugins.manager import PluginMarketplace
 
         marketplace = PluginMarketplace()
         plugin_info = marketplace.get_plugin_info(plugin_id)
@@ -517,7 +517,7 @@ async def install_marketplace_plugin(
 ):
     """Install a plugin from the marketplace."""
     try:
-        from plugin_manager import PluginMarketplace
+        from file_processor.plugins.manager import PluginMarketplace
 
         marketplace = PluginMarketplace()
         success = marketplace.install_plugin(plugin_id, force=force)
@@ -547,7 +547,7 @@ async def install_marketplace_plugin(
 async def uninstall_marketplace_plugin(plugin_id: str, api_key: str = Depends(verify_api_key)):
     """Uninstall a plugin."""
     try:
-        from plugin_manager import PluginMarketplace
+        from file_processor.plugins.manager import PluginMarketplace
 
         marketplace = PluginMarketplace()
         success = marketplace.uninstall_plugin(plugin_id)
@@ -577,7 +577,7 @@ async def uninstall_marketplace_plugin(plugin_id: str, api_key: str = Depends(ve
 async def check_marketplace_updates(api_key: str = Depends(verify_api_key)):
     """Check for plugin updates."""
     try:
-        from plugin_manager import PluginMarketplace
+        from file_processor.plugins.manager import PluginMarketplace
 
         marketplace = PluginMarketplace()
         updates = marketplace.check_updates()
@@ -598,7 +598,7 @@ async def check_marketplace_updates(api_key: str = Depends(verify_api_key)):
 async def list_marketplace_categories(api_key: str = Depends(verify_api_key)):
     """List plugin categories."""
     try:
-        from plugin_manager import PluginMarketplace
+        from file_processor.plugins.manager import PluginMarketplace
 
         marketplace = PluginMarketplace()
         categories = marketplace.catalog.get("categories", [])

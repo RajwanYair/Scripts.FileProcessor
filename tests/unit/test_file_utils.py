@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
+import pytest
 
 from file_processor.core.file_utils import (
     EXT_MAP,

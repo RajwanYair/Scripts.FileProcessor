@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import signal
 from pathlib import Path
+import signal
 from unittest.mock import patch
 
-import pytest
 from click.testing import CliRunner
+import pytest
 
 from file_processor.cli.main import cli
 

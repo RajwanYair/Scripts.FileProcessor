@@ -27,8 +27,8 @@ Usage:
     predictions = await manager.infer(model, input_data)
 """
 
-import logging
 from datetime import datetime
+import logging
 from pathlib import Path
 from typing import Any
 

@@ -27,14 +27,11 @@
   "ruff.format.enable": true,
   "ruff.organizeImports": true,
   // ─── Pylance / type checking ──────────────────────────────────────────
-  "python.analysis.typeCheckingMode": "standard",
+  // The Pylance analysis settings (type checking mode, extra paths, stub path)
+  // are managed exclusively via pyrightconfig.json — do not duplicate them here.
   "python.analysis.autoImportCompletions": true,
   "python.analysis.indexing": true,
-  "python.analysis.extraPaths": [
-    "src"
-  ],
   "python.analysis.diagnosticMode": "workspace",
-  "python.analysis.stubPath": "typestubs",
   // ─── Testing ─────────────────────────────────────────────────────────
   "python.testing.pytestEnabled": true,
   "python.testing.unittestEnabled": false,
@@ -71,5 +68,10 @@
   },
   "yaml.schemas": {
     "https://json.schemastore.org/github-workflow.json": ".github/workflows/*.yml"
-  }
+  },
+  // ─── Network / Proxy ──────────────────────────────────────────────────
+  // Resolved from system WPAD (http://wpad.intel.com/wpad.dat) for github.com
+  "http.proxy": "http://proxy-dmz.intel.com:912",
+  "http.proxyStrictSSL": false,
+  "http.proxySupport": "override"
 }
