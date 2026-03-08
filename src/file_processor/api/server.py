@@ -358,6 +358,7 @@ async def process_file(
             raise HTTPException(status_code=404, detail=f"File not found: {file_id}")
 
         # Create job
+        created_at = datetime.now()
         job = {
             "job_id": job_id,
             "file_id": file_id,
@@ -365,7 +366,7 @@ async def process_file(
             "operation": request.operation,
             "options": request.options,
             "status": "processing",
-            "created_at": datetime.now(),
+            "created_at": created_at,
             "result": None,
             "error": None,
         }
@@ -384,7 +385,7 @@ async def process_file(
             job_id=job_id,
             status="processing",
             message=f"Processing started for {file_path.name}",
-            created_at=job["created_at"],
+            created_at=created_at,
         )
 
     except HTTPException:

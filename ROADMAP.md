@@ -118,13 +118,13 @@
 - LLM-powered natural language file query interface
 - Federated processing across multiple nodes
 
-#### Objectives
+### Objectives
 
 Transform the platform from powerful to **intelligent** with AI/ML capabilities that understand content and learn from user behavior.
 
-#### Key Deliverables
+### Key Deliverables
 
-##### 1. ML Infrastructure
+#### 1. ML Infrastructure
 
 - [ ] MLflow integration for experiment tracking
 - [ ] Model registry with versioning (Staging → Production)
