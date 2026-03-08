@@ -27,8 +27,8 @@ Usage:
     predictions = await manager.infer(model, input_data)
 """
 
-from datetime import datetime
 import logging
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -363,8 +363,8 @@ class InferenceManager:
         """
         # Check cache
         if not force_reload and name in self.model_cache and version in self.model_cache[name]:
-                logger.info(f"Using cached model {name} v{version}")
-                return self.model_cache[name][version]
+            logger.info(f"Using cached model {name} v{version}")
+            return self.model_cache[name][version]
 
         # Get model path from registry
         model_path = self.registry.get_model_path(name, version)

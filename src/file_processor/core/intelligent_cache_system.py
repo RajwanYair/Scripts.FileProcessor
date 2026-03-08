@@ -22,22 +22,22 @@ Python: 3.9+ required
 """
 
 import asyncio
-from collections import OrderedDict, defaultdict
 import contextlib
-from dataclasses import dataclass, field
-from enum import Enum, auto
 import json
 import logging
-from pathlib import Path
 import pickle
 import sqlite3
 import threading
 import time
+import zlib
+from collections import OrderedDict, defaultdict
+from dataclasses import dataclass, field
+from enum import Enum, auto
+from pathlib import Path
 from typing import (
     Any,
     TypeVar,
 )
-import zlib
 
 logger = logging.getLogger(__name__)
 

@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import signal
 from pathlib import Path
+from unittest.mock import patch
 
-from click.testing import CliRunner
 import pytest
+from click.testing import CliRunner
 
 from file_processor.cli.main import cli
 
@@ -160,3 +162,112 @@ class TestPluginsGroup:
     def test_plugins_remove_requires_argument(self, runner: CliRunner) -> None:
         result = runner.invoke(cli, ["plugins", "remove"])
         assert result.exit_code != 0
+
+
+# ── shutdown handler ───────────────────────────────────────────────────────────
+
+
+@pytest.mark.unit
+class TestShutdownHandler:
+    def test_shutdown_raises_systemexit(self) -> None:
+        from file_processor.cli.main import _shutdown
+
+        with pytest.raises(SystemExit):
+            _shutdown(signal.SIGTERM, None)
+
+    def test_shutdown_exits_with_code_zero(self) -> None:
+        from file_processor.cli.main import _shutdown
+
+        with pytest.raises(SystemExit) as exc_info:
+            _shutdown(signal.SIGINT, None)
+        assert exc_info.value.code == 0
+
+
+# ── main() entry point ─────────────────────────────────────────────────────────
+
+
+@pytest.mark.unit
+class TestMainEntryPoint:
+    def test_main_registers_signals_and_calls_cli(self) -> None:
+        """main() registers SIGTERM/SIGINT handlers then delegates to cli()."""
+        import file_processor.cli.main as main_module
+
+        with patch.object(main_module, "cli") as mock_cli:
+            main_module.main()
+        mock_cli.assert_called_once()
+
+
+# ── serve command ──────────────────────────────────────────────────────────────
+
+
+@pytest.mark.unit
+class TestServeCommand:
+    def test_serve_help_exits_zero(self, runner: CliRunner) -> None:
+        result = runner.invoke(cli, ["serve", "--help"])
+        assert result.exit_code == 0
+
+    def test_serve_exits_one_when_uvicorn_missing(self, runner: CliRunner) -> None:
+        with patch.dict("sys.modules", {"uvicorn": None}):
+            result = runner.invoke(cli, ["serve"])
+        assert result.exit_code == 1
+
+
+# ── process command (additional branches) ─────────────────────────────────────
+
+
+@pytest.mark.unit
+class TestProcessCommandBranches:
+    def test_no_dry_run_logs_start(self, runner: CliRunner, tmp_path: Path) -> None:
+        """Exercises the non-dry-run code path (logger.info)."""
+        result = runner.invoke(cli, ["process", "--source", str(tmp_path)])
+        assert result.exit_code == 0
+
+    def test_verbose_dry_run_combined(self, runner: CliRunner, tmp_path: Path) -> None:
+        result = runner.invoke(
+            cli, ["--verbose", "--dry-run", "process", "--source", str(tmp_path)]
+        )
+        assert result.exit_code == 0
+
+    def test_custom_dest(self, runner: CliRunner, tmp_path: Path) -> None:
+        dest = tmp_path / "out"
+        dest.mkdir()
+        result = runner.invoke(cli, ["process", "--source", str(tmp_path), "--dest", str(dest)])
+        assert result.exit_code == 0
+
+    def test_no_recursive(self, runner: CliRunner, tmp_path: Path) -> None:
+        result = runner.invoke(cli, ["process", "--source", str(tmp_path), "--no-recursive"])
+        assert result.exit_code == 0
+
+
+# ── deduplicate dry-run ────────────────────────────────────────────────────────
+
+
+@pytest.mark.unit
+class TestDeduplicateDryRun:
+    def test_dry_run_shows_message(self, runner: CliRunner, tmp_path: Path) -> None:
+        result = runner.invoke(cli, ["--dry-run", "deduplicate", "--source", str(tmp_path)])
+        assert result.exit_code == 0
+        assert "dry-run" in result.output.lower()
+
+
+# ── plugins extra commands ─────────────────────────────────────────────────────
+
+
+@pytest.mark.unit
+class TestPluginsExtraCommands:
+    def test_plugins_update_no_name(self, runner: CliRunner) -> None:
+        """Update with no name → updates all (empty list means 'Done.' immediately)."""
+        result = runner.invoke(cli, ["plugins", "update"])
+        assert result.exit_code == 0
+
+    def test_plugins_install_unknown_exits_nonzero(self, runner: CliRunner) -> None:
+        result = runner.invoke(cli, ["plugins", "install", "unknown-plugin-xyz"])
+        assert result.exit_code != 0
+
+    def test_plugins_remove_unknown_exits_nonzero(self, runner: CliRunner) -> None:
+        result = runner.invoke(cli, ["plugins", "remove", "unknown-plugin-xyz"])
+        assert result.exit_code != 0
+
+    def test_plugins_list_with_category_filter(self, runner: CliRunner) -> None:
+        result = runner.invoke(cli, ["plugins", "list", "--category", "media"])
+        assert result.exit_code == 0

@@ -1,0 +1,68 @@
+============================= test session starts =============================
+collected 145 items
+
+tests\unit\test_base.py ...................                              [ 13%]
+tests\unit\test_cli.py ............................F...........          [ 40%]
+tests\unit\test_config.py ...................                            [ 53%]
+tests\unit\test_file_utils.py ..........................                 [ 71%]
+tests\unit\test_plugin_manager.py .............FF.....                   [ 85%]
+tests\unit\test_results.py .....................
+ERROR: Coverage failure: total of 68.57 is less than fail-under=70.00
+                                                                         [100%]
+
+================================== FAILURES ===================================
+________________ TestMainEntryPoint.test_main_help_exits_zero _________________
+..\..\..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\click\testing.py:499: in invoke
+    prog_name = extra.pop("prog_name")
+                ^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'prog_name'
+
+During handling of the above exception, another exception occurred:
+tests\unit\test_cli.py:194: in test_main_help_exits_zero
+    result = runner.invoke(main, ["--help"])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\click\testing.py:501: in invoke
+    prog_name = self.get_default_prog_name(cli)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\click\testing.py:268: in get_default_prog_name
+    return cli.name or "root"
+           ^^^^^^^^
+E   AttributeError: 'function' object has no attribute 'name'
+__ TestPluginInstallationState.test_is_installed_true_after_manifest_placed ___
+tests\unit\test_plugin_manager.py:121: in test_is_installed_true_after_manifest_placed
+    assert mp.is_installed("text-analyzer")
+E   AssertionError: assert False
+E    +  where False = is_installed('text-analyzer')
+E    +    where is_installed = <file_processor.plugins.manager.PluginMarketplace object at 0x000002E93ECDC940>.is_installed
+____ TestPluginInstallationState.test_get_installed_version_reads_manifest ____
+tests\unit\test_plugin_manager.py:128: in test_get_installed_version_reads_manifest
+    assert mp.get_installed_version("text-analyzer") == "2.0.0"
+E   AssertionError: assert None == '2.0.0'
+E    +  where None = get_installed_version('text-analyzer')
+E    +    where get_installed_version = <file_processor.plugins.manager.PluginMarketplace object at 0x000002E93EC48730>.get_installed_version
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.14.0-final-0 _______________
+
+Name                                        Stmts   Miss Branch BrPart   Cover   Missing
+----------------------------------------------------------------------------------------
+src\file_processor\__init__.py                  5      0      0      0 100.00%
+src\file_processor\cli\__init__.py              2      0      0      0 100.00%
+src\file_processor\cli\main.py                129     12     18      4  87.76%   52-54, 222-225, 248-249, 261, 276, 291-292
+src\file_processor\core\__init__.py             0      0      0      0 100.00%
+src\file_processor\core\base.py               136     48     34      3  65.29%   76, 84-85, 137, 147-162, 181-212, 217-222, 239-281
+src\file_processor\core\file_utils.py          43      5      8      1  88.24%   25-28, 84
+src\file_processor\core\processor.py           42     23      4      0  41.30%   28, 75-92, 96-97, 105-109
+src\file_processor\core\results.py             60      0      4      0 100.00%
+src\file_processor\plugins\__init__.py          2      0      0      0 100.00%
+src\file_processor\plugins\manager.py         187    104     68      7  43.92%   86-87, 94-102, 112-188, 196-204, 212-229, 241, 245, 252-253, 259-277, 281-302
+src\file_processor\utils\__init__.py            2      0      0      0 100.00%
+src\file_processor\utils\config_loader.py      45      0     16      0 100.00%
+----------------------------------------------------------------------------------------
+TOTAL                                         653    192    152     15  68.57%
+Coverage XML written to file coverage.xml
+FAIL Required test coverage of 70% not reached. Total coverage: 68.57%
+=========================== short test summary info ===========================
+FAILED tests/unit/test_cli.py::TestMainEntryPoint::test_main_help_exits_zero
+FAILED tests/unit/test_plugin_manager.py::TestPluginInstallationState::test_is_installed_true_after_manifest_placed
+FAILED tests/unit/test_plugin_manager.py::TestPluginInstallationState::test_get_installed_version_reads_manifest
+======================== 3 failed, 142 passed in 8.82s ========================

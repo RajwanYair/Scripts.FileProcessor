@@ -8,10 +8,10 @@ Supports Linux FICLONE, macOS clonefile, copy_file_range, sendfile, and optimize
 
 import logging
 import os
-from pathlib import Path
 import platform
 import shutil
 import time
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 

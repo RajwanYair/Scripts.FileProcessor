@@ -1,71 +1,88 @@
 {
-    // VS Code launch configurations for Scripts.FileProcessor
-    // Use F5 to launch the selected configuration.
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "CLI: process --help",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "file_processor.cli.main",
-            "args": ["--help"],
-            "console": "integratedTerminal",
-            "justMyCode": true
-        },
-        {
-            "name": "CLI: process (current file)",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "file_processor.cli.main",
-            "args": ["process", "${file}"],
-            "console": "integratedTerminal",
-            "justMyCode": true
-        },
-        {
-            "name": "CLI: process (input folder)",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "file_processor.cli.main",
-            "args": [
-                "process",
-                "--input", "${workspaceFolder}/tests/fixtures",
-                "--dry-run",
-                "--verbose"
-            ],
-            "console": "integratedTerminal",
-            "justMyCode": true
-        },
-        {
-            "name": "API: FastAPI dev server",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "uvicorn",
-            "args": [
-                "file_processor.api.server:app",
-                "--host", "127.0.0.1",
-                "--port", "8000",
-                "--reload"
-            ],
-            "console": "integratedTerminal",
-            "justMyCode": false
-        },
-        {
-            "name": "Tests: run all (pytest)",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "pytest",
-            "args": ["tests", "-v", "--no-cov"],
-            "console": "integratedTerminal",
-            "justMyCode": false
-        },
-        {
-            "name": "Tests: current test file",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "pytest",
-            "args": ["${file}", "-v", "--no-cov", "-s"],
-            "console": "integratedTerminal",
-            "justMyCode": false
-        }
-    ]
+  // VS Code launch configurations for Scripts.FileProcessor
+  // Use F5 to launch the selected configuration.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "CLI: process --help",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "file_processor.cli.main",
+      "args": [
+        "--help"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "CLI: process (current file)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "file_processor.cli.main",
+      "args": [
+        "process",
+        "${file}"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "CLI: process (input folder)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "file_processor.cli.main",
+      "args": [
+        "process",
+        "--input",
+        "${workspaceFolder}/tests/fixtures",
+        "--dry-run",
+        "--verbose"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "API: FastAPI dev server",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "file_processor.api.server:app",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8000",
+        "--reload"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Tests: run all (pytest)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests",
+        "-v",
+        "--no-cov"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Tests: current test file",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "${file}",
+        "-v",
+        "--no-cov",
+        "-s"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": false
+    }
+  ]
 }

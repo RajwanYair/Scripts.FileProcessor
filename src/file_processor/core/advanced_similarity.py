@@ -13,14 +13,14 @@ Usage:
     python advanced_similarity.py . --verbose --gpu
 """
 
-from collections import defaultdict
-from dataclasses import dataclass
 import logging
 import os
-from pathlib import Path
 import re
 import sys
 import time
+from collections import defaultdict
+from dataclasses import dataclass
+from pathlib import Path
 
 # Add core module to path for when running standalone
 sys.path.insert(0, os.path.dirname(__file__))

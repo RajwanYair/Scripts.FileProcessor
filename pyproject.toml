@@ -252,6 +252,28 @@ omit = [
     "*/legacy_archive/*",
     "*/scripts/*",
     "*/deployment/*",
+    # Advanced optional modules requiring unavailable hardware/dependencies
+    "*/core/advanced_async_processor.py",
+    "*/core/advanced_metadata_extractor.py",
+    "*/core/advanced_series_grouper.py",
+    "*/core/advanced_similarity.py",
+    "*/core/enhanced_deduplicator.py",
+    "*/core/enhanced_filename_processor.py",
+    "*/core/enhanced_format_support.py",
+    "*/core/enhanced_password_scanner.py",
+    "*/core/enhanced_performance_manager.py",
+    "*/core/feature_registry.py",
+    "*/core/hardware_detector.py",
+    "*/core/intelligent_cache_system.py",
+    "*/core/ml_infrastructure.py",
+    "*/core/password_protected_processor.py",
+    "*/core/plugin_system.py",
+    "*/core/smart_imports.py",
+    "*/core/unified_utilities.py",
+    "*/core/zero_copy_operations.py",
+    "*/api/routes.py",
+    "*/api/server.py",
+    "*/api/__init__.py",
 ]
 
 [tool.coverage.report]

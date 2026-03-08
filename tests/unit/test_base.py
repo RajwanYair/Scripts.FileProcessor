@@ -87,3 +87,87 @@ class TestBaseProcessor:
         assert processor.processed_count == 0
         assert processor.error_count == 0
         assert processor.skipped_count == 0
+
+    def test_simulate_process_returns_would_process(self, source_dir: Path) -> None:
+        from file_processor.core.base import ProcessingConfig
+
+        cfg = ProcessingConfig(source_dir=source_dir, dry_run=True)
+        processor = BaseProcessor(cfg)
+        f = source_dir / "a.txt"
+        result = processor.simulate_process(f)
+        assert result["success"] is True
+        assert result["action"] == "would_process"
+        assert "a.txt" in result["message"]
+
+    def test_simulate_process_returns_size(self, source_dir: Path) -> None:
+        from file_processor.core.base import ProcessingConfig
+
+        cfg = ProcessingConfig(source_dir=source_dir)
+        processor = BaseProcessor(cfg)
+        f = source_dir / "a.txt"
+        result = processor.simulate_process(f)
+        assert "size" in result
+        assert result["size"] >= 0
+
+    def test_get_files_excludes_oversized(self, source_dir: Path) -> None:
+        from file_processor.core.base import ProcessingConfig
+
+        big = source_dir / "big.dat"
+        big.write_bytes(b"x" * (2 * 1024 * 1024))  # 2 MB
+        cfg = ProcessingConfig(source_dir=source_dir, recursive=False, max_file_size=1)
+        processor = BaseProcessor(cfg)
+        files = processor.get_files()
+        assert big not in files
+
+    def test_get_files_includes_small_files_under_max_size(self, source_dir: Path) -> None:
+        from file_processor.core.base import ProcessingConfig
+
+        cfg = ProcessingConfig(source_dir=source_dir, recursive=False, max_file_size=100)
+        processor = BaseProcessor(cfg)
+        files = processor.get_files()
+        assert len(files) == 3  # a.txt, b.jpg, c.jpeg
+
+    def test_process_file_raises_not_implemented(self, source_dir: Path) -> None:
+        from file_processor.core.base import ProcessingConfig
+
+        cfg = ProcessingConfig(source_dir=source_dir)
+        processor = BaseProcessor(cfg)
+        with pytest.raises(NotImplementedError):
+            processor.process_file(source_dir / "a.txt")
+
+    def test_process_files_dry_run_calls_simulate(self, source_dir: Path) -> None:
+        from file_processor.core.base import ProcessingConfig
+
+        cfg = ProcessingConfig(source_dir=source_dir, dry_run=True, recursive=False)
+        processor = BaseProcessor(cfg)
+        files = processor.get_files()
+        results = processor.process_files(files)
+        assert len(results["details"]) == len(files)
+        assert all(d["action"] == "would_process" for d in results["details"])
+
+    def test_process_files_single_thread(self, source_dir: Path) -> None:
+        from file_processor.core.base import ProcessingConfig
+
+        class SimpleProcessor(BaseProcessor):
+            def process_file(self, file_path: Path) -> dict:
+                return {"success": True, "file": str(file_path)}
+
+        cfg = ProcessingConfig(source_dir=source_dir, recursive=False, workers=1)
+        processor = SimpleProcessor(cfg)
+        files = processor.get_files()
+        results = processor.process_files(files)
+        assert results["processed"] == len(files)
+        assert results["errors"] == 0
+
+    def test_process_files_handles_exception_in_single_thread(self, source_dir: Path) -> None:
+        from file_processor.core.base import ProcessingConfig
+
+        class ErrorProcessor(BaseProcessor):
+            def process_file(self, file_path: Path) -> dict:
+                raise ValueError("deliberate error")
+
+        cfg = ProcessingConfig(source_dir=source_dir, recursive=False, workers=1)
+        processor = ErrorProcessor(cfg)
+        files = processor.get_files()
+        results = processor.process_files(files)
+        assert results["errors"] == len(files)

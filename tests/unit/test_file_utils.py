@@ -2,11 +2,16 @@
 
 from __future__ import annotations
 
+import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
-import pytest
 
-from file_processor.core.file_utils import EXT_MAP, normalize_extension, sanitize_filename
+from file_processor.core.file_utils import (
+    EXT_MAP,
+    normalize_extension,
+    sanitize_filename,
+    translate_filename,
+)
 
 # Characters that are always forbidden in cross-platform filenames
 _FORBIDDEN = set('<>:"/\\|?*')
@@ -114,3 +119,72 @@ class TestSanitizeFilenameProperties:
         once = sanitize_filename(name)
         twice = sanitize_filename(once)
         assert once == twice
+
+
+# ── translate_filename ─────────────────────────────────────────────────────────
+
+
+@pytest.mark.unit
+class TestTranslateFilename:
+    def test_returns_original_when_no_translator(self) -> None:
+        """translator=None → always a no-op."""
+        assert translate_filename("hello.txt", translator=None) == "hello.txt"
+
+    def test_ascii_words_pass_through_unchanged(self, monkeypatch) -> None:
+        """ASCII-only words should never be sent to the translator."""
+        from file_processor.core import file_utils
+
+        monkeypatch.setattr(file_utils, "TRANSLATION_AVAILABLE", True)
+
+        class _Translator:
+            def translate(self, word, dest="en"):
+                raise AssertionError("ASCII words should not be translated")
+
+        result = translate_filename("hello_world.txt", translator=_Translator())
+        assert result == "hello_world.txt"
+
+    def test_non_ascii_word_translated(self, monkeypatch) -> None:
+        """Non-ASCII words go through the translator."""
+        from file_processor.core import file_utils
+
+        monkeypatch.setattr(file_utils, "TRANSLATION_AVAILABLE", True)
+
+        class _Result:
+            text = "cat"
+
+        class _Translator:
+            def translate(self, word, dest="en"):
+                return _Result()
+
+        result = translate_filename("猫.jpg", translator=_Translator())
+        assert result == "cat.jpg"
+
+    def test_translation_error_falls_back_to_original_word(self, monkeypatch) -> None:
+        """If translation raises, the original word is preserved (no crash)."""
+        from file_processor.core import file_utils
+
+        monkeypatch.setattr(file_utils, "TRANSLATION_AVAILABLE", True)
+
+        class _Translator:
+            def translate(self, word, dest="en"):
+                raise RuntimeError("service unavailable")
+
+        result = translate_filename("猫.txt", translator=_Translator())
+        assert result.endswith(".txt")
+
+    def test_empty_segments_skipped(self, monkeypatch) -> None:
+        """Empty word segments (from consecutive delimiters) are skipped."""
+        from file_processor.core import file_utils
+
+        monkeypatch.setattr(file_utils, "TRANSLATION_AVAILABLE", True)
+
+        class _Translator:
+            def translate(self, word, dest="en"):
+                class R:
+                    text = word
+
+                return R()
+
+        result = translate_filename("a__b.txt", translator=_Translator())
+        # Just check no crash and extension preserved
+        assert result.endswith(".txt")
