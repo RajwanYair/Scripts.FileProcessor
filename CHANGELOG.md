@@ -9,6 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `pyrightconfig.json` — all optional hardware/GPU/ML modules added to `exclude`
+  list so Pylance no longer reports unresolvable imports (`cupy`, `pyopencl`,
+  `onnxruntime`, `hachoir`, `cv2`, `rarfile`, `magic`) for those intentionally
+  optional advanced modules
+
+### Fixed
+
+- `README.md` — CI and CodeQL badge URLs corrected from placeholder
+  `file-processor/file-processor` to actual repo `RajwanYair/Scripts.FileProcessor`;
+  badges now render correctly on the GitHub main page
+- `.github/readme.md` — removed from git; was rendering on GitHub when browsing
+  the `.github/` folder, creating confusion with the actual root `README.md`
+- `api/server.py` — removed stale `global active_jobs` declaration (leftover from
+  pre-refactor; `_state.active_jobs` is used throughout as intended)
+- `api/server.py` — extract `created_at = datetime.now()` before dict literal so
+  `ProcessingResponse(created_at=created_at)` is typed `datetime` not `object`
+- `core/file_utils.py` — removed unnecessary `# type: ignore[assignment,misc]`
+  from `Translator = None` fallback (Pylance no longer requires it)
+- `api/server.py`, `tests/unit/test_cli.py`, `tests/unit/test_file_utils.py` —
+  import blocks re-sorted by ruff (`I001` violations fixed)
+- `ROADMAP.md` — heading levels corrected (MD001): `#### Objectives` and
+  `#### Key Deliverables` under `## Under Consideration` demoted to `###` to
+  prevent h2 → h4 skip; sub-headings shifted accordingly
+
 - `.pre-commit-config.yaml` with ruff, mypy, bandit, conventional-commit hooks
 - `.editorconfig` for cross-editor consistency
 - `.github/workflows/codeql.yml` — SAST security scanning via CodeQL
