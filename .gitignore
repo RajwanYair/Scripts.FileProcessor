@@ -30,6 +30,9 @@ share/python-wheels/
 MANIFEST
 *.whl
 
+# --------------- Runtime-created plugin install directories ---------------
+src/file_processor/plugins/plugins/
+
 # --------------- Testing & coverage ---------------
 .pytest_cache/
 .hypothesis/
